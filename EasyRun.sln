@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRun", "EasyRun\EasyRun.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0FBDC752-30EE-4FAA-A4A4-E00EF8B79F46}"
 	ProjectSection(SolutionItems) = preProject
-		EasyRun\README.md = EasyRun\README.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global

@@ -38,7 +38,7 @@ Tye requires Docker installed. You can download and install Docker from <https:/
 There are two different profiles you can use. Tye and Visual Studio. You can
 choose which one when you create or edit a profile.
 
-![Add new profile](doc/Add-new-profile.png)
+![Add new profile](Doc/Add-new-profile.png)
 
 ## Profile settings file and secrets
 
@@ -55,11 +55,11 @@ The first section defines your profiles and the RegEx project filter. There is
 no dedicated button for running your projects. Just do as you always do after
 selecting one or multiple projects.
 
-![Visual Studio Profiles](doc/Profiles-VS.png)
+![Visual Studio Profiles](Doc/Profiles-VS.png)
 
 ## Tye Profiles
 
-![Tye Profiles](doc/Profiles-Tye.png)
+![Tye Profiles](Doc/Profiles-Tye.png)
 
 For Tye, you have a few extra options.
 
@@ -72,7 +72,7 @@ For each Profile, you can:
 
 Each Tye profile has a set of options.
 
-![Tye profile configuration](doc/Tye-configuration.png)
+![Tye profile configuration](Doc/Tye-configuration.png)
 
 #### Wait on attach
 
@@ -102,7 +102,7 @@ Docker. What container depends on the logging type you choose.
 
 For each Tye service, the following options can be set.
 
-![Tye service configuration](doc/Tye-service-configuration.png)
+![Tye service configuration](Doc/Tye-service-configuration.png)
 
 #### Bindings
 
