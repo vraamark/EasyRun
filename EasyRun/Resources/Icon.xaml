@@ -1,0 +1,6 @@
+ <!--This icon was created using https://github.com/BerndK/SvgToXaml and coping geometry to to Xaml Path Data-->
+<Canvas Width="16" Height="16" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <Path Fill="#FF4C9FE2" Data="F0 M16,16z M0,0z M11.344,7.313C11.589,7.455 11.741,7.717 11.741,8 11.741,8.283 11.589,8.545 11.344,8.687 9.749,9.609 6.932,11.237 5.336,12.16 5.09,12.302 4.788,12.302 4.542,12.16 4.296,12.019 4.145,11.757 4.145,11.473L4.145,4.527C4.145,4.243 4.296,3.981 4.542,3.84 4.788,3.698 5.09,3.698 5.336,3.84 6.932,4.763 9.749,6.391 11.344,7.313z"/>
+    <Path Stroke="#FF1A5D94" StrokeThickness="0.78" Data="F0 M16,16z M0,0z M2.424,6.04L2.424,2.424 13.576,2.424" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeDashCap="Flat" StrokeLineJoin="Round"/>
+    <Path Stroke="#FF1A5D94" StrokeThickness="0.78" Data="F0 M16,16z M0,0z M2.424,9.958L2.424,13.576 13.576,13.576" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeDashCap="Flat" StrokeLineJoin="Round"/>
+</Canvas>    

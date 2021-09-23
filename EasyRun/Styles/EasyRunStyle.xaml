@@ -1,0 +1,88 @@
+﻿<ResourceDictionary x:Class="EasyRun.Styles"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+                    xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"                                 
+                    xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0">
+    
+    <!-- Tool button -->
+    <ControlTemplate x:Key="ToolButtonTemplate" TargetType="{x:Type Button}">
+        <Border x:Name="border" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0">
+            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                              Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              Margin="0" RecognizesAccessKey="True"
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsDefaulted" Value="True">
+                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarHoverKey}}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarMouseDownBackgroundMiddleKey}}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Info button -->
+    <ControlTemplate x:Key="InfoButtonTemplate" TargetType="{x:Type Button}">
+        <Border x:Name="border" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0">
+            <Grid>
+                <Path Width="14" Height="14" x:Name="cross" Data="M2,2L12,12M12,2L2,12" Stroke="#606060" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Border Background="Transparent" BorderBrush="{x:Null}" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsDefaulted" Value="True">
+                <Setter Property="Stroke" TargetName="cross" Value="Black" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Stroke" TargetName="cross" Value="Black"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Stroke" TargetName="cross" Value="#606060"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Expander button -->
+    <ControlTemplate x:Key="ExpanderButtonTemplate" TargetType="{x:Type ToggleButton}">
+        <Border x:Name="border" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0" SnapsToDevicePixels="True">
+            <imaging:CrispImage x:Name="expandericon" Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.ExpandDown}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarHoverKey}}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarMouseDownBackgroundMiddleKey}}"/>
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Moniker" TargetName="expandericon" Value="{x:Static catalog:KnownMonikers.CollapseUp}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- PasswordShowHide button -->
+    <ControlTemplate x:Key="ShowHideSecretButtonTemplate" TargetType="{x:Type ToggleButton}">
+        <Border Width="22" Height="22" x:Name="border" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0" SnapsToDevicePixels="True">
+            <imaging:CrispImage x:Name="expandericon" Width="16" Height="16" Moniker="{x:Static catalog:KnownMonikers.Edit}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarHoverKey}}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarMouseDownBackgroundMiddleKey}}"/>
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Moniker" TargetName="expandericon" Value="{x:Static catalog:KnownMonikers.CloakOrHide}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+</ResourceDictionary>
