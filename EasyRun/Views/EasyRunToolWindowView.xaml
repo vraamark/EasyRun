@@ -427,6 +427,16 @@
                                         <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" d:BorderBrush="Black"/>
 
                                         <!-- Bindings -->
+                                        <Grid Grid.Row="0" Margin="0,8,8,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition SharedSizeGroup="B"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" Content="Name" Foreground="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}"/>
+                                            <TextBox Text="{Binding TyeName, UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" VerticalContentAlignment="Center" Style="{DynamicResource {x:Static vsshell:VsResourceKeys.TextBoxStyleKey}}" VerticalScrollBarVisibility="Disabled" AcceptsReturn="True"/>
+                                        </Grid>
+
+                                        <!-- Bindings -->
                                         <Grid Grid.Row="1" Margin="0,8,8,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition SharedSizeGroup="B"/>
