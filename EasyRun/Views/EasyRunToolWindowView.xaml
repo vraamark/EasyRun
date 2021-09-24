@@ -426,7 +426,7 @@
                                         </Grid.RowDefinitions>
                                         <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" d:BorderBrush="Black"/>
 
-                                        <!-- Bindings -->
+                                        <!-- Tye Name -->
                                         <Grid Grid.Row="0" Margin="0,8,8,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition SharedSizeGroup="B"/>
