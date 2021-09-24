@@ -54,7 +54,8 @@ namespace EasyRun.Settings
                     model,
                     Formatting.Indented,
                     new JsonSerializerSettings()
-                    { ContractResolver = new IgnorePropertiesResolver(nameof(ServiceModel.SecretEnvVariables)) });
+                    { ContractResolver = new IgnorePropertiesResolver(nameof(ServiceModel.SecretEnvVariables)), 
+                        DefaultValueHandling = DefaultValueHandling.Ignore });
 
                 File.WriteAllText(settingsFilename, jsonSettings);
 

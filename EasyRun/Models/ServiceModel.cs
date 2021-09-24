@@ -1,4 +1,5 @@
 ﻿using EasyRun.Binding;
+using System.ComponentModel;
 
 namespace EasyRun.Models
 {
@@ -27,6 +28,7 @@ namespace EasyRun.Models
             set { SetProperty(ref name, value); }
         }
 
+        [DefaultValue("")]
         public string TyeName
         {
             get { return tyeName; }
@@ -69,6 +71,7 @@ namespace EasyRun.Models
             set { SetProperty(ref secretEnvVariables, value); }
         }
 
+        [DefaultValue(1)]
         public int Replicas
         {
             get { return replicas; }

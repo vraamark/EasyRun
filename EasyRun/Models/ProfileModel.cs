@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -80,12 +81,14 @@ namespace EasyRun.Models
             set { SetProperty(ref watch, value); }
         }
 
+        [DefaultValue(8000)]
         public int TyePort
         {
             get { return tyePort; }
             set { SetProperty(ref tyePort, value); }
         }
 
+        [DefaultValue("")]
         public string Filter
         {
             get { return filter; }
