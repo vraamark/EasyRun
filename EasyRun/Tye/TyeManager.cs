@@ -80,7 +80,15 @@ namespace EasyRun.Tye
                 foreach (var service in profile.FilteredServices.Where(w => w.Selected))
                 {
                     var projectFile = PathUtility.GetAbsolutePath(solutionPath, service.ProjectFile);
-                    var serviceName = service.Name.Replace(".", "-").ToLower();
+                    string serviceName;
+                    if (string.IsNullOrEmpty(service.TyeName))
+                    {
+                        serviceName = service.Name.Replace(".", "-").ToLower();
+                    }
+                    else
+                    {
+                        serviceName = service.TyeName.Replace(".", "-").ToLower();
+                    }
 
                     yaml.AppendFormat("- name: {0}", serviceName)
                         .AppendLine()
