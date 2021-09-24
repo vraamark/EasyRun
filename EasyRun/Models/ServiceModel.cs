@@ -5,6 +5,7 @@ namespace EasyRun.Models
     public class ServiceModel : BindableBase
     {
         private string name;
+        private string tyeName;
         private string projectFile;
         private bool selected;
         private string bindings;
@@ -24,6 +25,12 @@ namespace EasyRun.Models
         {
             get { return name; }
             set { SetProperty(ref name, value); }
+        }
+
+        public string TyeName
+        {
+            get { return tyeName; }
+            set { SetProperty(ref tyeName, value); }
         }
 
         public string ProjectFile
