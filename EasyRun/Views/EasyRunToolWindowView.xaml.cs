@@ -4,6 +4,7 @@ using EasyRun.Logging;
 using EasyRun.Models;
 using EasyRun.PubSubEvents;
 using EasyRun.Settings;
+using EasyRun.Studio;
 using EasyRun.Tye;
 using EnvDTE;
 using EnvDTE80;
@@ -120,7 +121,7 @@ namespace EasyRun.Views
                 tyeManager.StopTye(Model.SelectedProfile);
             }
         }
-        
+
         private void ShowDashboard()
         {
             if (Model.SelectedProfile != null)
@@ -365,10 +366,10 @@ namespace EasyRun.Views
             {
                 return;
             }
-            
+
             if (isAdded || !solutionIsOpening)
             {
-                vsServiceList = GetVsServiceList();
+                vsServiceList = dte.GetVsServiceList();
                 settingsManager.SyncWithVsServices(Model, vsServiceList);
             }
         }
@@ -384,7 +385,7 @@ namespace EasyRun.Views
 
             if (isRemoved)
             {
-                vsServiceList = GetVsServiceList(projectName);
+                vsServiceList = dte.GetVsServiceList(projectName);
 
                 settingsManager.SyncWithVsServices(Model, vsServiceList);
             }
@@ -394,7 +395,7 @@ namespace EasyRun.Views
         private void OnAfterRenameProject()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            var changedServiceList = GetVsServiceList();
+            var changedServiceList = dte.GetVsServiceList();
 
             var changedDic = changedServiceList.ToDictionary(k => k.ProjectFile, v => v);
             var currentDic = vsServiceList.ToDictionary(k => k.ProjectFile, v => v);
@@ -444,7 +445,7 @@ namespace EasyRun.Views
                     return;
                 }
 
-                vsServiceList = GetVsServiceList();
+                vsServiceList = dte.GetVsServiceList();
 
                 var loadedModel = settingsManager.LoadProfiles(vsServiceList);
 
@@ -492,76 +493,6 @@ namespace EasyRun.Views
             vsServiceList.Clear();
             Model.SetToDefault(vsServiceList);
             settingsManager.SolutionClosed();
-        }
-
-        private List<ServiceModel> GetVsServiceList(string excludeProjectName = null)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            var newVsServiceList = new List<ServiceModel>();
-
-            Projects projects = dte.Solution.Projects;
-
-            if (projects.Count > 0)
-            {
-                foreach (Project project in projects)
-                {
-                    AddProject(project, newVsServiceList, excludeProjectName);
-                    FindProjects(project.ProjectItems, newVsServiceList, excludeProjectName);
-                }
-            }
-
-            return newVsServiceList.OrderBy(o => o.Name).ToList();
-        }
-
-        private void FindProjects(ProjectItems projectItems, List<ServiceModel> newVsServiceList, string excludeProjectName)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            if (projectItems != null)
-            {
-                foreach (ProjectItem projectItem in projectItems)
-                {
-                    if (projectItem.Object is Project project)
-                    {
-                        AddProject(project, newVsServiceList, excludeProjectName);
-
-                        if (project.ProjectItems != null)
-                        {
-                            FindProjects(project.ProjectItems, newVsServiceList, excludeProjectName);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void AddProject(Project project, List<ServiceModel> newVsServiceList, string excludeProjectName)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            try
-            {
-                var name = project.Name;
-
-                if (!string.IsNullOrEmpty(excludeProjectName) && name.Equals(excludeProjectName, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return;
-                }
-
-                var filename = project.FileName;
-
-                if (!string.IsNullOrEmpty(filename) && filename.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
-                {
-                    filename = SettingsManager.GetRelativePathToSolution(dte, filename);
-                    newVsServiceList.Add(new ServiceModel() { Name = name, ProjectFile = filename });
-                }
-            }
-                #pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
-            catch (Exception)
-                #pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
-            {
-                // We get an exception if filename cannot be read.
-            }
         }
 
         private void FilterChanged(string filterText)

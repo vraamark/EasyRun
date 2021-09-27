@@ -54,6 +54,7 @@
     <Compile Include="Dialogs\DialogTextParameter.cs" />
     <Compile Include="Dialogs\DialogResponse.cs" />
     <Compile Include="Dialogs\Interfaces\IDialogParameter.cs" />
+    <Compile Include="Studio\VSProjects.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaState.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaStatusDTO.cs" />
     <Compile Include="Tye\DTOS\TyeServiceType.cs" />
