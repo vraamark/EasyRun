@@ -12,6 +12,9 @@ namespace EasyRun.Studio
 {
     public static class VSProjects
     {
+        private static readonly Guid vsProjectKindSolutionFolder = new Guid("2150E333-8FDC-42A3-9474-1A3956D46DE8");
+        private static readonly Guid vsProjectKindMisc = new Guid("66A2671D-8FB5-11D2-AA7E-00C04F688DDE");
+
         public static List<ServiceModel> GetVsServiceList(this DTE2 dte, string excludeProjectName = null)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -59,7 +62,11 @@ namespace EasyRun.Studio
 
             try
             {
-                // Ignore libraries.
+                if (Guid.TryParse(project.Kind, out var kind) && (kind == vsProjectKindMisc || kind == vsProjectKindSolutionFolder))
+                {
+                    return;
+                }
+
                 if (GetProperty<prjOutputType>(project, "OutputType", out var outputType) && outputType == prjOutputType.prjOutputTypeLibrary)
                 {
                     return;
