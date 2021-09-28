@@ -2,6 +2,7 @@
 using EasyRun.PubSubEvents;
 using EasyRun.Settings;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -66,7 +67,9 @@ namespace EasyRun
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
+            var dte = GetGlobalService(typeof(DTE)) as DTE2;
+            Assumes.Present(dte);
+
             IVsOutputWindow outputWindow = await GetServiceAsync(typeof(SVsOutputWindow)) as IVsOutputWindow;
             var outputWindow2 = dte.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
             Logger.Initialize(outputWindow, outputWindow2);
@@ -77,7 +80,7 @@ namespace EasyRun
             {
                 HandleOpenSolution();
             }
-
+            
             await AdviseEventsAsync();
             
             await EasyRunToolWindowCommand.InitializeAsync(this);

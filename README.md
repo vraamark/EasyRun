@@ -153,11 +153,3 @@ them.
 
 Here you can define how many replicas (instances) of the service you want to run
 simultaneously.
-
-## To-Do's
-
--   Add Docker images to run with Tye.
--   Add binary files to run with Tye.
--   Launch configuration when running Visual Studio multi startup projects.
--   Support even more Tye features.
--   Add sourcecode to GitHub.
