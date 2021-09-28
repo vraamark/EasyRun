@@ -31,7 +31,7 @@ Tye requires Docker installed. You can download and install Docker from <https:/
 -   Auto-generate temporary Tye YAML file outside your Git Repository.
 -   Use encrypted Secret Environment Variables (e.g., ConnectionString and password) outside your Git Repository.
 -   Auto attaches Visual Studio debugger when you run your projects.
--   RegEx filter to include/exclude pårojects.
+-   RegEx filter to include/exclude projects.
 
 # Profiles
 
@@ -68,7 +68,23 @@ For each Profile, you can:
 -   Auto Attach the debugger.
 -   Launch the Tye Dashboard.
 
-## Tye profile configuration
+### Save selections as defaults
+
+To reduce Git changes (or what ever you use), there are two "save modes" in EasyRun. You can choose between:
+
+A) Service selections will automatically be saved when profiles are saved. This is useful if you create many different profiles but rarely change the selections.
+
+B) Selections are not saved when you save profiles. Instead, you have to click on the link "Save current selections as default" to save your selections. This is useful if you have few profiles and change the selections between running Tye.
+
+You can change what works best for you in Visual Studio Options.
+
+![Tye autosave selections](Doc/Tye-autosave-selections.png)
+
+When the option is set to false, the manually save link is shown in the tool window.
+
+![Tye save selections](Doc/Tye-save-selections.png)
+
+### Tye profile configuration
 
 Each Tye profile has a set of options.
 
@@ -103,6 +119,11 @@ Docker. What container depends on the logging type you choose.
 For each Tye service, the following options can be set.
 
 ![Tye service configuration](Doc/Tye-service-configuration.png)
+
+#### Name
+
+This is the name the service will have when running in Tye. The project name will
+be used if the field is left blank.
 
 #### Bindings
 

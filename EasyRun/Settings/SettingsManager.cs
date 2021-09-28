@@ -33,6 +33,7 @@ namespace EasyRun.Settings
             }
 
             ChangePathsToRelative(model);
+            SetSelectDefaultsOnSave(model);
 
             var currentChecksum = CalcProfileChecksum(model);
             if (currentChecksum == ProfileChecksum)
@@ -69,6 +70,23 @@ namespace EasyRun.Settings
                 Logger.LogException(ex);
                 return false;
             }
+        }
+
+        public bool SaveSelectionsAsDefault(EasyRunModel model, ProfileModel profile)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (profile is null)
+            {
+                return false;
+            }
+
+            foreach (var service in profile.Services)
+            {
+                service.DefaultSelected = service.Selected;
+            }
+
+            return SaveProfiles(model);
         }
 
         private void ChangePathsToRelative(EasyRunModel model)
@@ -149,6 +167,8 @@ namespace EasyRun.Settings
                     var jsonSettings = File.ReadAllText(settingsFilename);
                     var model = JsonConvert.DeserializeObject<EasyRunModel>(jsonSettings);
 
+                    SetSelectDefaultsOnLoad(model);
+
                     SyncWithVsServices(model, vsServiceList);
 
                     LoadSecretEnvVariables(model);
@@ -166,6 +186,33 @@ namespace EasyRun.Settings
             }
 
             return null;
+        }
+
+        public void SetSelectDefaultsOnLoad(EasyRunModel model)
+        {
+            foreach (var profile in model.Profiles)
+            {
+                foreach (var service in profile.Services)
+                {
+                    service.Selected = service.DefaultSelected;
+                }
+            }
+        }
+
+        public void SetSelectDefaultsOnSave(EasyRunModel model)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (GeneralOptions.Instance.AutosaveSelectionsAsDefault)
+            {
+                foreach (var profile in model.Profiles)
+                {
+                    foreach (var service in profile.Services)
+                    {
+                        service.DefaultSelected = service.Selected;
+                    }
+                }
+            }
         }
 
         public void SyncWithVsServices(EasyRunModel model, List<ServiceModel> vsServiceList)

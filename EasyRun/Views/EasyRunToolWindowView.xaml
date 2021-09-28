@@ -329,13 +329,29 @@
             </Grid>
 
             <Grid Margin="8,16,8,8" Grid.Row="2">
-                <CheckBox
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox
                     IsEnabled="{Binding State.NotRunning}"
                     Content="Select all"
                     IsChecked="{Binding Model.AllSelected}"
                     Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}"
                     VerticalAlignment="Center">
-                </CheckBox>
+                    </CheckBox>
+                    <!--<Button
+                        Content="Save selection as default"
+                        Margin="8,0,0,0"
+                        Grid.Column="2"
+                        Width="150"
+                        MinHeight="22"
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource {x:Static vsshell:VsResourceKeys.ButtonStyleKey}}"
+                        Command="{Binding ShowDashboardCommand}"
+                        HorizontalAlignment="Left"/>-->
+
+                    <TextBlock Visibility="{Binding State.AutosaveSelectionsAsDefault, Converter={StaticResource VisibilityConverter}, ConverterParameter='Collapsed;Visible'}" Margin="16,0,0,0" VerticalAlignment="Center">
+                        <Hyperlink  Command="{Binding SaveSelectionsAsDefaultCommand}">Save current selections as default</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
 
                 <!-- Image (Docker) and Exe files.
                 <StackPanel Visibility="{Binding Model.SelectedProfile.UseTye, Converter={StaticResource VisibilityConverter}, ConverterParameter='Visible;Collapsed'}" Orientation="Horizontal" HorizontalAlignment="Right">

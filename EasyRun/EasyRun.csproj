@@ -54,6 +54,9 @@
     <Compile Include="Dialogs\DialogTextParameter.cs" />
     <Compile Include="Dialogs\DialogResponse.cs" />
     <Compile Include="Dialogs\Interfaces\IDialogParameter.cs" />
+    <Compile Include="PubSubEvents\PubSubOptionChange.cs" />
+    <Compile Include="Settings\DialogPageProvider.cs" />
+    <Compile Include="Settings\GeneralOptions.cs" />
     <Compile Include="Studio\VSProjects.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaState.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaStatusDTO.cs" />
