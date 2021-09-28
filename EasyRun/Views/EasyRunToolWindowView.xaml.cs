@@ -113,6 +113,8 @@ namespace EasyRun.Views
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            settingsManager.SaveProfiles(Model);
+
             if (Model.SelectedProfile?.UseTye == true)
             {
                 var anySelected = Model.SelectedProfile.FilteredServices.Any(w => w.Selected);
