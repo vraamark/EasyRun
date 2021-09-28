@@ -10,6 +10,7 @@ namespace EasyRun.Models
         private ObservableCollection<LoggingTargetModel> loggingTargets = LoggingTargetModel.GetDefault();
         private bool showInfo;
         private string showInfoText;
+        private bool autosaveSelectionsAsDefault;
 
         public bool Running
         {
@@ -50,6 +51,12 @@ namespace EasyRun.Models
         {
             get { return showInfoText; }
             set { SetProperty(ref showInfoText, value); }
+        }
+
+        public bool AutosaveSelectionsAsDefault
+        {
+            get { return autosaveSelectionsAsDefault; }
+            set { SetProperty(ref autosaveSelectionsAsDefault, value); }
         }
     }
 }

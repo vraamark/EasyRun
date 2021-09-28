@@ -51,12 +51,14 @@ namespace EasyRun.Views
         public RelayCommand ShowDashboardCommand { get; set; }
         public RelayCommand ServiceSelectionCommand { get; set; }
         public RelayCommand HideInfoCommand { get; set; }
-
+        public RelayCommand SaveSelectionsAsDefaultCommand { get; set; }
+        
         public EasyRunToolWindowView()
         {
             this.InitializeComponent();
 
             DataContext = this;
+            State.AutosaveSelectionsAsDefault = GeneralOptions.Instance.AutosaveSelectionsAsDefault;
 
             dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
             Assumes.Present(dte);
@@ -75,6 +77,19 @@ namespace EasyRun.Views
                 SolutionEvents(solutionEvent);
             });
 
+            pubSub.Subscribe<PubSubOptionChange>(this, change =>
+            {
+                ThreadHelper.ThrowIfNotOnUIThread();
+                if (change.OptionId.Equals(nameof(GeneralOptions.AutosaveSelectionsAsDefault)))
+                {
+                    var newValue = bool.Parse(change.NewValue);
+                    if (State.AutosaveSelectionsAsDefault != newValue)
+                    {
+                        State.AutosaveSelectionsAsDefault = newValue;
+                    }
+                }
+            });
+
             AddDockerCommand = new RelayCommand(_ => AddDocker());
             SaveProfileCommand = new RelayCommand(_ => SaveProfile());
             EditProfileCommand = new RelayCommand(_ => EditProfile());
@@ -86,6 +101,7 @@ namespace EasyRun.Views
             ShowDashboardCommand = new RelayCommand(_ => ShowDashboard());
             ServiceSelectionCommand = new RelayCommand(_ => ServiceSelection());
             HideInfoCommand = new RelayCommand(_ => HideInfo());
+            SaveSelectionsAsDefaultCommand = new RelayCommand(_ => SaveSelectionsAsDefault());
 
             if (!settingsManager.IsLoaded())
             {
@@ -177,6 +193,21 @@ namespace EasyRun.Views
             if (success)
             {
                 ShowInfo("Profiles was saved.", true);
+            }
+            else
+            {
+                ShowInfo("Nothing new to save.", true);
+            }
+        }
+
+        private void SaveSelectionsAsDefault()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            bool success = settingsManager.SaveSelectionsAsDefault(Model, Model.SelectedProfile);
+            if (success)
+            {
+                ShowInfo("Profile defaults was saved.", true);
             }
             else
             {

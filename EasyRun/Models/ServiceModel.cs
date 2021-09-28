@@ -1,4 +1,5 @@
 ﻿using EasyRun.Binding;
+using Newtonsoft.Json;
 
 namespace EasyRun.Models
 {
@@ -8,6 +9,7 @@ namespace EasyRun.Models
         private string tyeName;
         private string projectFile;
         private bool selected;
+        private bool defaultSelected;
         private string bindings;
         private string arguments;
         private string envVariables;
@@ -39,10 +41,17 @@ namespace EasyRun.Models
             set { SetProperty(ref projectFile, value); }
         }
 
+        [JsonIgnore]
         public bool Selected
         {
             get { return selected; }
             set { SetProperty(ref selected, value); }
+        }
+
+        public bool DefaultSelected
+        {
+            get { return defaultSelected; }
+            set { SetProperty(ref defaultSelected, value); }
         }
 
         public string Bindings

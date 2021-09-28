@@ -1,5 +1,6 @@
 ﻿using EasyRun.Logging;
 using EasyRun.PubSubEvents;
+using EasyRun.Settings;
 using EnvDTE;
 using Microsoft;
 using Microsoft.VisualStudio;
@@ -35,6 +36,7 @@ namespace EasyRun
     [Guid("e4568a5d-446c-4d1e-b30a-9b1ef8625ffd")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(EasyRunToolWindow))]
+    [ProvideOptionPage(typeof(DialogPageProvider.General), "EasyRun", "General", 0, 0, true)]
     public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents
     {
         private Hub pubSub = Hub.Default;
