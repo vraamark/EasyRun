@@ -18,6 +18,8 @@ namespace EasyRun.Settings
     {
         private static readonly byte[] additionalEntropy = { 99, 17, 45, 67, 23, 77 };
 
+        private FileMonitor fileMonitor = new FileMonitor();
+
         public string ProfileChecksum { get; set; }
         public bool LoadHasBeenCalled { get; set; }
         public string SolutionFilename { get; set; }

@@ -28,9 +28,9 @@ namespace EasyRun.Views
         private readonly DTE2 dte;
         private readonly SettingsManager settingsManager = new SettingsManager();
         private readonly TyeManager tyeManager = new TyeManager();
-        private bool solutionIsOpening;
+        private readonly Hub pubSub = Hub.Default;
 
-        private Hub pubSub = Hub.Default;
+        private bool solutionIsOpening;
 
         private List<ServiceModel> vsServiceList = new List<ServiceModel>();
         private IObservable<string> textChangedObservable;
