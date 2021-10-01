@@ -18,6 +18,8 @@ namespace EasyRun.Settings
     {
         private static readonly byte[] additionalEntropy = { 99, 17, 45, 67, 23, 77 };
 
+        private FileMonitor fileMonitor = new FileMonitor();
+
         public string ProfileChecksum { get; set; }
         public bool LoadHasBeenCalled { get; set; }
         public string SolutionFilename { get; set; }
@@ -44,6 +46,8 @@ namespace EasyRun.Settings
 
             try
             {
+                fileMonitor.Pause = true;
+
                 var settingsFilename = GetSettingsFilename();
 
                 if (string.IsNullOrEmpty(settingsFilename))
@@ -69,6 +73,10 @@ namespace EasyRun.Settings
             {
                 Logger.LogException(ex);
                 return false;
+            }
+            finally
+            {
+                fileMonitor.Pause = false;
             }
         }
 
@@ -164,6 +172,8 @@ namespace EasyRun.Settings
 
                 if (!string.IsNullOrEmpty(settingsFilename) && File.Exists(settingsFilename))
                 {
+                    fileMonitor.Start(settingsFilename, "settings");
+
                     var jsonSettings = File.ReadAllText(settingsFilename);
                     var model = JsonConvert.DeserializeObject<EasyRunModel>(jsonSettings);
 

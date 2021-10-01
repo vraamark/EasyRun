@@ -23,11 +23,11 @@ namespace EasyRun.Tye
         private string loggerArg = string.Empty;
         private bool tyeQuerySubscribed;
         private IDisposable tyeQuery;
-        
+
         private System.Diagnostics.Process tyeProcess;
-        
+
         private Action processExitedAction;
-        
+
         private Guid instanceId;
 
         public bool TyeIsRunning { get; set; }
