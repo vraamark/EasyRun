@@ -46,6 +46,8 @@ namespace EasyRun.Settings
 
             try
             {
+                fileMonitor.Pause = true;
+
                 var settingsFilename = GetSettingsFilename();
 
                 if (string.IsNullOrEmpty(settingsFilename))
@@ -71,6 +73,10 @@ namespace EasyRun.Settings
             {
                 Logger.LogException(ex);
                 return false;
+            }
+            finally
+            {
+                fileMonitor.Pause = false;
             }
         }
 
@@ -166,6 +172,8 @@ namespace EasyRun.Settings
 
                 if (!string.IsNullOrEmpty(settingsFilename) && File.Exists(settingsFilename))
                 {
+                    fileMonitor.Start(settingsFilename, "settings");
+
                     var jsonSettings = File.ReadAllText(settingsFilename);
                     var model = JsonConvert.DeserializeObject<EasyRunModel>(jsonSettings);
 

@@ -2,11 +2,15 @@
 using PubSub;
 using System;
 using System.IO;
+using System.Reactive.Linq;
 
 namespace EasyRun.Settings
 {
     public class FileMonitor : IDisposable
     {
+        private const int ClosedMonitorInterval = 1;
+        private const int ClosedMonitorRetries = 10;
+
         private readonly Hub pubSub = Hub.Default;
         private readonly FileSystemEventHandler eventHandler;
 
@@ -14,6 +18,9 @@ namespace EasyRun.Settings
         private string id;
 
         private FileSystemWatcher watcher;
+        private bool closedMonitorSubscribed;
+        private IDisposable closedMonitor;
+
         private bool disposedValue;
 
         public FileMonitor()
@@ -23,14 +30,20 @@ namespace EasyRun.Settings
 
         public bool Pause { get; set; }
 
-        public void Start(string fullPath, string id)
+        public void Start(string monitorPath, string id)
         {
             if (watcher != null)
             {
+                if (!string.IsNullOrEmpty(this.fullPath) && this.fullPath.Equals(monitorPath))
+                {
+                    // Keep going.
+                    return;
+                }
+
                 Stop();
             }
 
-            this.fullPath = fullPath;
+            this.fullPath = monitorPath;
             this.id = id;
 
             var path = Path.GetDirectoryName(this.fullPath);
@@ -57,10 +70,28 @@ namespace EasyRun.Settings
 
         private void FileChanged(object sender, FileSystemEventArgs e)
         {
-            if (!Pause)
+            if (!Pause && !closedMonitorSubscribed)
             {
-                if (IsFileReady(e.FullPath))
+                closedMonitor = Observable.Interval(TimeSpan.FromSeconds(ClosedMonitorInterval))
+                    .Take(ClosedMonitorRetries)
+                    .Subscribe(number => NotifyFileClosed(number, e.FullPath));
+                closedMonitorSubscribed = true;
+            }
+        }
+
+        private void NotifyFileClosed(long number, string path)
+        {
+            if (number >= ClosedMonitorRetries-1)
+            {
+                closedMonitorSubscribed = false;
+                closedMonitor.Dispose();
+            }
+            else
+            {
+                if (IsFileReady(path))
                 {
+                    closedMonitorSubscribed = false;
+                    closedMonitor.Dispose();
                     pubSub.Publish(new PubSubFileMonitor(id));
                 }
             }

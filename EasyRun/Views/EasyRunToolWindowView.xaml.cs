@@ -55,6 +55,8 @@ namespace EasyRun.Views
         
         public EasyRunToolWindowView()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            
             this.InitializeComponent();
 
             DataContext = this;
@@ -71,24 +73,9 @@ namespace EasyRun.Views
 
             textChangedObservable.Subscribe(FilterChanged);
 
-            pubSub.Subscribe<PubSubSolution>(this, solutionEvent =>
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                SolutionEvents(solutionEvent);
-            });
-
-            pubSub.Subscribe<PubSubOptionChange>(this, change =>
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                if (change.OptionId.Equals(nameof(GeneralOptions.AutosaveSelectionsAsDefault)))
-                {
-                    var newValue = bool.Parse(change.NewValue);
-                    if (State.AutosaveSelectionsAsDefault != newValue)
-                    {
-                        State.AutosaveSelectionsAsDefault = newValue;
-                    }
-                }
-            });
+            pubSub.Subscribe<PubSubSolution>(this, solutionEvent => SolutionEvents(solutionEvent));
+            pubSub.Subscribe<PubSubOptionChange>(this, change => VisualStudioOptionsChange(change));
+            pubSub.Subscribe<PubSubFileMonitor>(this, change => FileMonitorChange(change));
 
             AddDockerCommand = new RelayCommand(_ => AddDocker());
             SaveProfileCommand = new RelayCommand(_ => SaveProfile());
@@ -106,6 +93,32 @@ namespace EasyRun.Views
             if (!settingsManager.IsLoaded())
             {
                 pubSub.Publish(new PubSubSolution(PubSubEventTypes.AfterOpenSolution));
+            }
+        }
+
+        private void VisualStudioOptionsChange(PubSubOptionChange change)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (change.OptionId.Equals(nameof(GeneralOptions.AutosaveSelectionsAsDefault)))
+            {
+                var newValue = bool.Parse(change.NewValue);
+                if (State.AutosaveSelectionsAsDefault != newValue)
+                {
+                    State.AutosaveSelectionsAsDefault = newValue;
+                }
+            }
+        }
+
+        private void FileMonitorChange(PubSubFileMonitor change)
+        {
+            if (change.Id.Equals("settings"))
+            {
+                ThreadHelper.JoinableTaskFactory.Run(async delegate
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    AfterOpenSolution(true);
+                    ShowInfo("Settingsfile reloaded", true);
+                });
             }
         }
 
