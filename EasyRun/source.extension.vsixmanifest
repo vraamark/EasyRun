@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="EasyRun.ebcca073-289a-486c-8b7b-1f7d5e8fc9ad" Version="0.8.0.10927" Language="en-US" Publisher="Brian Vraamark" />
+        <Identity Id="EasyRun.ebcca073-289a-486c-8b7b-1f7d5e8fc9ad" Version="0.9.0.11002" Language="en-US" Publisher="Brian Vraamark" />
         <DisplayName>EasyRun</DisplayName>
         <Description xml:space="preserve">EasyRun lets you startup multiple project at the same time using Tye or VS.</Description>
         <License>..\LICENSE</License>
