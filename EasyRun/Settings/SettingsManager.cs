@@ -63,6 +63,7 @@ namespace EasyRun.Settings
 
                 File.WriteAllText(settingsFilename, jsonSettings);
 
+                SaveDefaultSelectedProfile(model);
                 SaveSecretEnvVariables(model);
 
                 ProfileChecksum = currentChecksum;
@@ -151,6 +152,12 @@ namespace EasyRun.Settings
             File.WriteAllText(secretFilename, jsonSecrets);
         }
 
+        private void SaveDefaultSelectedProfile(EasyRunModel model)
+        {
+            var defaultSelection = GetDefaultSelectionSettingsFilename(model.SettingsId);
+            File.WriteAllText(defaultSelection, model.SelectedProfileName);
+        }
+
         public bool IsLoaded()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -181,6 +188,7 @@ namespace EasyRun.Settings
 
                     SyncWithVsServices(model, vsServiceList);
 
+                    LoadDefaultSelectedProfile(model);
                     LoadSecretEnvVariables(model);
 
                     ProfileChecksum = CalcProfileChecksum(model);
@@ -256,8 +264,26 @@ namespace EasyRun.Settings
                 }
             }
         }
+        private void LoadDefaultSelectedProfile(EasyRunModel model)
+        {
+            var defaultSelection = GetDefaultSelectionSettingsFilename(model.SettingsId);
+            if (File.Exists(defaultSelection))
+            {
+                model.SelectedProfileName = File.ReadAllText(defaultSelection);
+            }
+        }
 
         private string GetSecretFilename(Guid settingsId)
+        {
+            return Path.Combine(GetLocalSettingsDirectory(settingsId), "Secrets.json");
+        }
+
+        private string GetDefaultSelectionSettingsFilename(Guid settingsId)
+        {
+            return Path.Combine(GetLocalSettingsDirectory(settingsId), "DefaultSelection.txt");
+        }
+
+        private string GetLocalSettingsDirectory(Guid settingsId)
         {
             var docFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
@@ -267,8 +293,7 @@ namespace EasyRun.Settings
             {
                 Directory.CreateDirectory(easyRunFolder);
             }
-
-            return Path.Combine(easyRunFolder, "Secrets.json");
+            return easyRunFolder;
         }
 
         private string GetSettingsFilename()
@@ -328,10 +353,11 @@ namespace EasyRun.Settings
         {
             using (var shaManager = new SHA256Managed())
             {
-                var jsonProfiles = JsonConvert.SerializeObject(model, new JsonSerializerSettings() { ContractResolver = new IgnorePropertiesResolver(nameof(ServiceModel.SecretEnvVariables)) });
+                var checksumValue = model.SelectedProfileName;
+                checksumValue += JsonConvert.SerializeObject(model);
 
-                var encodedProfiles = Encoding.UTF8.GetBytes(jsonProfiles);
-                return BitConverter.ToString(shaManager.ComputeHash(encodedProfiles));
+                var encodedChecksumValue = Encoding.UTF8.GetBytes(checksumValue);
+                return BitConverter.ToString(shaManager.ComputeHash(encodedChecksumValue));
             }
         }
     }

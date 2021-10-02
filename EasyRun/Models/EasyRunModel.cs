@@ -20,6 +20,7 @@ namespace EasyRun.Models
             set { SetProperty(ref profiles, value); }
         }
 
+        [JsonIgnore]
         public string SelectedProfileName { get; set; }
 
         [JsonIgnore]
