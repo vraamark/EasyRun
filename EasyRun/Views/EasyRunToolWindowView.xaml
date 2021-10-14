@@ -335,6 +335,7 @@
                     Content="Select all"
                     IsChecked="{Binding Model.AllSelected}"
                     Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}"
+                    Command="{Binding SelectAllCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     VerticalAlignment="Center">
                     </CheckBox>
                     <!--<Button

@@ -50,6 +50,7 @@ namespace EasyRun.Views
         public RelayCommand StopCommand { get; set; }
         public RelayCommand ShowDashboardCommand { get; set; }
         public RelayCommand ServiceSelectionCommand { get; set; }
+        public RelayCommand SelectAllCommand { get; set; }
         public RelayCommand HideInfoCommand { get; set; }
         public RelayCommand SaveSelectionsAsDefaultCommand { get; set; }
         
@@ -87,6 +88,7 @@ namespace EasyRun.Views
             StopCommand = new RelayCommand(_ => Stop());
             ShowDashboardCommand = new RelayCommand(_ => ShowDashboard());
             ServiceSelectionCommand = new RelayCommand(_ => ServiceSelection());
+            SelectAllCommand = new RelayCommand(_ => SelectAll());
             HideInfoCommand = new RelayCommand(_ => HideInfo());
             SaveSelectionsAsDefaultCommand = new RelayCommand(_ => SaveSelectionsAsDefault());
 
@@ -195,6 +197,11 @@ namespace EasyRun.Views
         }
 
         private void ServiceSelection()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            SelectServices();
+        }
+        private void SelectAll()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             SelectServices();
