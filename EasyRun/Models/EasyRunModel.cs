@@ -1,4 +1,5 @@
 ﻿using EasyRun.Binding;
+using EasyRun.CustomAttributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace EasyRun.Models
         private ProfileModel selectedProfile = new ProfileModel();
         private ObservableCollection<ProfileModel> profiles = new ObservableCollection<ProfileModel>();
 
+        [JsonTarget(JsonTargetType.Solution)]
         public Guid SettingsId { get; set; } = Guid.NewGuid();
 
         public ObservableCollection<ProfileModel> Profiles
@@ -20,7 +22,7 @@ namespace EasyRun.Models
             set { SetProperty(ref profiles, value); }
         }
 
-        [JsonIgnore]
+        [JsonTarget(JsonTargetType.User)]
         public string SelectedProfileName { get; set; }
 
         [JsonIgnore]
@@ -63,6 +65,5 @@ namespace EasyRun.Models
                 }
             }
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using EasyRun.Logging;
+﻿using EasyRun.CustomAttributes;
+using EasyRun.Logging;
 using EasyRun.Models;
 using EnvDTE;
 using EnvDTE80;
@@ -48,23 +49,10 @@ namespace EasyRun.Settings
             {
                 fileMonitor.Pause = true;
 
-                var settingsFilename = GetSettingsFilename();
-
-                if (string.IsNullOrEmpty(settingsFilename))
+                if (!SaveSolutionSettings(model) || !SaveUserSettings(model) || !SaveSecretEnvVariables(model))
                 {
                     return false;
                 }
-
-                var jsonSettings = JsonConvert.SerializeObject(
-                    model,
-                    Formatting.Indented,
-                    new JsonSerializerSettings()
-                    { ContractResolver = new IgnorePropertiesResolver(nameof(ServiceModel.SecretEnvVariables)) });
-
-                File.WriteAllText(settingsFilename, jsonSettings);
-
-                SaveDefaultSelectedProfile(model);
-                SaveSecretEnvVariables(model);
 
                 ProfileChecksum = currentChecksum;
 
@@ -79,6 +67,78 @@ namespace EasyRun.Settings
             {
                 fileMonitor.Pause = false;
             }
+        }
+
+        private bool SaveSolutionSettings(EasyRunModel model)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var settingsFilename = GetSolutionSettingsFilename();
+
+            if (string.IsNullOrEmpty(settingsFilename))
+            {
+                return false;
+            }
+
+            var jsonSettings = JsonConvert.SerializeObject(
+                model,
+                Formatting.Indented,
+                new JsonSerializerSettings() { ContractResolver = new TargetPropertiesResolver(JsonTargetType.Solution) });
+
+            File.WriteAllText(settingsFilename, jsonSettings);
+
+            return true;
+        }
+
+        private bool SaveUserSettings(EasyRunModel model)
+        {
+            var settingsFilename = GetUserSettingsFilename(model.SettingsId);
+
+            if (string.IsNullOrEmpty(settingsFilename))
+            {
+                return false;
+            }
+
+            var jsonSettings = JsonConvert.SerializeObject(
+                model,
+                Formatting.Indented,
+                new JsonSerializerSettings() { ContractResolver = new TargetPropertiesResolver(JsonTargetType.User) });
+
+            File.WriteAllText(settingsFilename, jsonSettings);
+
+            return true;
+        }
+
+        private bool SaveSecretEnvVariables(EasyRunModel model)
+        {
+            var secretFilename = GetSecretFilename(model.SettingsId);
+
+            if (string.IsNullOrEmpty(secretFilename))
+            {
+                return false;
+            }
+
+            var secrets = new Dictionary<string, string>();
+
+            foreach (var profile in model.Profiles)
+            {
+                foreach (var service in profile.Services)
+                {
+                    var secret = service.SecretEnvVariables;
+
+                    if (!string.IsNullOrEmpty(secret))
+                    {
+                        secret = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(secret), additionalEntropy, DataProtectionScope.LocalMachine));
+                    }
+                    secrets.Add($"{profile.Name}.{service.Name}", secret);
+                }
+            }
+
+            var jsonSecrets = JsonConvert.SerializeObject(secrets, Formatting.Indented);
+
+            File.WriteAllText(secretFilename, jsonSecrets);
+
+            return true;
         }
 
         public bool SaveSelectionsAsDefault(EasyRunModel model, ProfileModel profile)
@@ -96,6 +156,94 @@ namespace EasyRun.Settings
             }
 
             return SaveProfiles(model);
+        }
+
+        public EasyRunModel LoadProfiles(List<ServiceModel> vsServiceList)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            LoadHasBeenCalled = true;
+
+            try
+            {
+                var settingsFilename = GetSolutionSettingsFilename();
+
+                if (!string.IsNullOrEmpty(settingsFilename) && File.Exists(settingsFilename))
+                {
+                    fileMonitor.Start(settingsFilename, "settings");
+
+                    var jsonSettings = File.ReadAllText(settingsFilename);
+                    var model = JsonConvert.DeserializeObject<EasyRunModel>(
+                        jsonSettings,
+                        new JsonSerializerSettings() { ContractResolver = new TargetPropertiesResolver(JsonTargetType.Solution) });
+
+                    MergeUserSettings(model);
+                    LoadSecretEnvVariables(model);
+                    SetSelectDefaultsOnLoad(model);
+                    SyncWithVsServices(model, vsServiceList);
+
+                    ProfileChecksum = CalcProfileChecksum(model);
+                    SolutionFilename = GetSolutionFilename();
+
+                    return model;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            return null;
+        }
+
+        private void MergeUserSettings(EasyRunModel model)
+        {
+            var settingsFilename = GetUserSettingsFilename(model.SettingsId);
+            if (File.Exists(settingsFilename))
+            {
+                var jsonSettings = File.ReadAllText(settingsFilename);
+
+                var userModel = JsonConvert.DeserializeObject<EasyRunModel>(
+                    jsonSettings,
+                    new JsonSerializerSettings() { ContractResolver = new TargetPropertiesResolver(JsonTargetType.User) });
+
+                var modelDic = model.Profiles.ToDictionary(k => k.Name, v => v);
+
+                foreach (var userProfile in userModel.Profiles)
+                {
+                    if (modelDic.TryGetValue(userProfile.Name, out var profile))
+                    {
+                        profile.AttachDebugger = userProfile.AttachDebugger;
+                        profile.WaitOnAttachDebugger = userProfile.WaitOnAttachDebugger;
+                        profile.Watch = userProfile.Watch;
+                    }
+                }
+
+                model.SelectedProfileName = userModel.SelectedProfileName;
+            }
+        }
+
+        private void LoadSecretEnvVariables(EasyRunModel model)
+        {
+            var secretFilename = GetSecretFilename(model.SettingsId);
+
+            if (!string.IsNullOrEmpty(secretFilename) && File.Exists(secretFilename))
+            {
+                var jsonSecrets = File.ReadAllText(secretFilename);
+                var secrets = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonSecrets);
+
+                foreach (var profile in model.Profiles)
+                {
+                    foreach (var service in profile.Services)
+                    {
+                        if (secrets.TryGetValue($"{profile.Name}.{service.Name}", out var secret) && !string.IsNullOrEmpty(secret))
+                        {
+                            secret = Encoding.UTF8.GetString(ProtectedData.Unprotect(Convert.FromBase64String(secret), additionalEntropy, DataProtectionScope.LocalMachine));
+                            service.SecretEnvVariables = secret;
+                        }
+                    }
+                }
+            }
         }
 
         private void ChangePathsToRelative(EasyRunModel model)
@@ -127,37 +275,6 @@ namespace EasyRun.Settings
             SolutionFilename = string.Empty;
         }
 
-        private void SaveSecretEnvVariables(EasyRunModel model)
-        {
-            var secrets = new Dictionary<string, string>();
-
-            foreach (var profile in model.Profiles)
-            {
-                foreach (var service in profile.Services)
-                {
-                    var secret = service.SecretEnvVariables;
-
-                    if (!string.IsNullOrEmpty(secret))
-                    {
-                        secret = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(secret), additionalEntropy, DataProtectionScope.LocalMachine));
-                    }
-                    secrets.Add($"{profile.Name}.{service.Name}", secret);
-                }
-            }
-
-            var jsonSecrets = JsonConvert.SerializeObject(secrets, Formatting.Indented);
-
-            var secretFilename = GetSecretFilename(model.SettingsId);
-
-            File.WriteAllText(secretFilename, jsonSecrets);
-        }
-
-        private void SaveDefaultSelectedProfile(EasyRunModel model)
-        {
-            var defaultSelection = GetDefaultSelectionSettingsFilename(model.SettingsId);
-            File.WriteAllText(defaultSelection, model.SelectedProfileName);
-        }
-
         public bool IsLoaded()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -165,45 +282,6 @@ namespace EasyRun.Settings
             var currentSolutionFileName = GetSolutionFilename();
 
             return LoadHasBeenCalled && !string.IsNullOrEmpty(currentSolutionFileName) && currentSolutionFileName.Equals(SolutionFilename, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public EasyRunModel LoadProfiles(List<ServiceModel> vsServiceList)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            LoadHasBeenCalled = true;
-
-            try
-            {
-                var settingsFilename = GetSettingsFilename();
-
-                if (!string.IsNullOrEmpty(settingsFilename) && File.Exists(settingsFilename))
-                {
-                    fileMonitor.Start(settingsFilename, "settings");
-
-                    var jsonSettings = File.ReadAllText(settingsFilename);
-                    var model = JsonConvert.DeserializeObject<EasyRunModel>(jsonSettings);
-
-                    SetSelectDefaultsOnLoad(model);
-
-                    SyncWithVsServices(model, vsServiceList);
-
-                    LoadDefaultSelectedProfile(model);
-                    LoadSecretEnvVariables(model);
-
-                    ProfileChecksum = CalcProfileChecksum(model);
-
-                    SolutionFilename = GetSolutionFilename();
-
-                    return model;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-
-            return null;
         }
 
         public void SetSelectDefaultsOnLoad(EasyRunModel model)
@@ -242,45 +320,14 @@ namespace EasyRun.Settings
             }
         }
 
-        private void LoadSecretEnvVariables(EasyRunModel model)
-        {
-            var secretFilename = GetSecretFilename(model.SettingsId);
-
-            if (!string.IsNullOrEmpty(secretFilename) && File.Exists(secretFilename))
-            {
-                var jsonSecrets = File.ReadAllText(secretFilename);
-                var secrets = JsonConvert.DeserializeObject<Dictionary<string,string>>(jsonSecrets);
-
-                foreach (var profile in model.Profiles)
-                {
-                    foreach (var service in profile.Services)
-                    {
-                        if (secrets.TryGetValue($"{profile.Name}.{service.Name}", out var secret) && !string.IsNullOrEmpty(secret))
-                        {
-                            secret = Encoding.UTF8.GetString(ProtectedData.Unprotect(Convert.FromBase64String(secret), additionalEntropy, DataProtectionScope.LocalMachine));
-                            service.SecretEnvVariables = secret;
-                        }
-                    }
-                }
-            }
-        }
-        private void LoadDefaultSelectedProfile(EasyRunModel model)
-        {
-            var defaultSelection = GetDefaultSelectionSettingsFilename(model.SettingsId);
-            if (File.Exists(defaultSelection))
-            {
-                model.SelectedProfileName = File.ReadAllText(defaultSelection);
-            }
-        }
-
         private string GetSecretFilename(Guid settingsId)
         {
             return Path.Combine(GetLocalSettingsDirectory(settingsId), "Secrets.json");
         }
 
-        private string GetDefaultSelectionSettingsFilename(Guid settingsId)
+        private string GetUserSettingsFilename(Guid settingsId)
         {
-            return Path.Combine(GetLocalSettingsDirectory(settingsId), "DefaultSelection.txt");
+            return Path.Combine(GetLocalSettingsDirectory(settingsId), "User.json");
         }
 
         private string GetLocalSettingsDirectory(Guid settingsId)
@@ -296,7 +343,7 @@ namespace EasyRun.Settings
             return easyRunFolder;
         }
 
-        private string GetSettingsFilename()
+        private string GetSolutionSettingsFilename()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -353,8 +400,7 @@ namespace EasyRun.Settings
         {
             using (var shaManager = new SHA256Managed())
             {
-                var checksumValue = model.SelectedProfileName;
-                checksumValue += JsonConvert.SerializeObject(model);
+                var checksumValue = JsonConvert.SerializeObject(model);
 
                 var encodedChecksumValue = Encoding.UTF8.GetBytes(checksumValue);
                 return BitConverter.ToString(shaManager.ComputeHash(encodedChecksumValue));

@@ -1,4 +1,5 @@
 ﻿using EasyRun.Binding;
+using EasyRun.CustomAttributes;
 using Newtonsoft.Json;
 
 namespace EasyRun.Models
@@ -17,24 +18,28 @@ namespace EasyRun.Models
         private int replicas = 1;
         private ServiceType serviceType;
 
+        [JsonTarget(JsonTargetType.Solution)]
         public ServiceType ServiceType
         {
             get { return serviceType; }
             set { SetProperty(ref serviceType, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string Name
         {
             get { return name; }
             set { SetProperty(ref name, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string TyeName
         {
             get { return tyeName; }
             set { SetProperty(ref tyeName, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string ProjectFile
         {
             get { return projectFile; }
@@ -48,36 +53,42 @@ namespace EasyRun.Models
             set { SetProperty(ref selected, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public bool DefaultSelected
         {
             get { return defaultSelected; }
             set { SetProperty(ref defaultSelected, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string Bindings
         {
             get { return bindings; }
             set { SetProperty(ref bindings, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string Arguments
         {
             get { return arguments; }
             set { SetProperty(ref arguments, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string EnvVariables
         {
             get { return envVariables; }
             set { SetProperty(ref envVariables, value); }
         }
-        
+
+        [JsonTarget(JsonTargetType.Secrets)]
         public string SecretEnvVariables
         {
             get { return secretEnvVariables; }
             set { SetProperty(ref secretEnvVariables, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public int Replicas
         {
             get { return replicas; }
