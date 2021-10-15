@@ -38,11 +38,14 @@ namespace EasyRun
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(EasyRunToolWindow))]
     [ProvideOptionPage(typeof(DialogPageProvider.General), "EasyRun", "General", 0, 0, true)]
-    public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents
+    public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents, IVsSelectionEvents
     {
         private Hub pubSub = Hub.Default;
         private IVsSolution2 solution = null;
         private uint solutionEventsCookie;
+
+        private IVsMonitorSelection monitorSelection = null;
+        private uint selectionEventsCookie;
 
         protected override void Dispose(bool disposing)
         {
@@ -53,6 +56,11 @@ namespace EasyRun
             if (solution != null && solutionEventsCookie != 0)
             {
                 solution.UnadviseSolutionEvents(solutionEventsCookie);
+            }
+
+            if (monitorSelection != null && selectionEventsCookie != 0)
+            {
+                monitorSelection.UnadviseSelectionEvents(selectionEventsCookie);
             }
         }
 
@@ -80,9 +88,9 @@ namespace EasyRun
             {
                 HandleOpenSolution();
             }
-            
+
             await AdviseEventsAsync();
-            
+
             await EasyRunToolWindowCommand.InitializeAsync(this);
         }
 
@@ -96,6 +104,16 @@ namespace EasyRun
                 // Register for solution events
                 solution.AdviseSolutionEvents(this, out solutionEventsCookie);
             }
+
+            monitorSelection = await GetServiceAsync(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
+            if (monitorSelection != null)
+            {
+                // Remember debugging UI context cookie for later
+                //ms.GetCmdUIContextCookie(VSConstants.UICONTEXT.Debugging_guid, out debuggingCookie);
+                // Register for selection events
+                monitorSelection.AdviseSelectionEvents(this, out selectionEventsCookie);
+            }
+
         }
 
         private async Task<bool> IsSolutionLoadedAsync()
@@ -252,6 +270,29 @@ namespace EasyRun
         public int OnAfterBackgroundSolutionLoadComplete()
         {
             HandleOpenSolution();
+            return VSConstants.S_OK;
+        }
+
+        public int OnSelectionChanged(IVsHierarchy pHierOld, uint itemidOld, IVsMultiItemSelect pMISOld, ISelectionContainer pSCOld, IVsHierarchy pHierNew, uint itemidNew, IVsMultiItemSelect pMISNew, ISelectionContainer pSCNew)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnElementValueChanged(uint elementid, object varValueOld, object varValueNew)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (elementid == (uint)VSConstants.VSSELELEMID.SEID_StartupProject)
+            {
+                if (GeneralOptions.Instance.SyncWithStartupProjects)
+                {
+                    pubSub.Publish(new PubSubSolution(PubSubEventTypes.OnStartupProjectChanged));
+                }
+            }
+            return VSConstants.S_OK;
+        }
+
+        public int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
+        {
             return VSConstants.S_OK;
         }
     }

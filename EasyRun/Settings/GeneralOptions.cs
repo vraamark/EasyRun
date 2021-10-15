@@ -29,7 +29,7 @@ namespace EasyRun.Settings
         [Category("Profiles")]
         [DisplayName("Sync with startup project selections")]
         [Description("Selections will automatically change in current profile if startup projects are changed from solution explorer.")]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool SyncWithStartupProjects { get; set; } = true;
     }
 }
