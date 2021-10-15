@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using PubSub;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -31,6 +32,7 @@ namespace EasyRun.Views
         private readonly Hub pubSub = Hub.Default;
 
         private bool solutionIsOpening;
+        private bool readyForSyncSelection;
 
         private List<ServiceModel> vsServiceList = new List<ServiceModel>();
         private IObservable<string> textChangedObservable;
@@ -50,6 +52,7 @@ namespace EasyRun.Views
         public RelayCommand StopCommand { get; set; }
         public RelayCommand ShowDashboardCommand { get; set; }
         public RelayCommand ServiceSelectionCommand { get; set; }
+        public RelayCommand SelectAllCommand { get; set; }
         public RelayCommand HideInfoCommand { get; set; }
         public RelayCommand SaveSelectionsAsDefaultCommand { get; set; }
         
@@ -87,6 +90,7 @@ namespace EasyRun.Views
             StopCommand = new RelayCommand(_ => Stop());
             ShowDashboardCommand = new RelayCommand(_ => ShowDashboard());
             ServiceSelectionCommand = new RelayCommand(_ => ServiceSelection());
+            SelectAllCommand = new RelayCommand(_ => SelectAll());
             HideInfoCommand = new RelayCommand(_ => HideInfo());
             SaveSelectionsAsDefaultCommand = new RelayCommand(_ => SaveSelectionsAsDefault());
 
@@ -195,6 +199,11 @@ namespace EasyRun.Views
         }
 
         private void ServiceSelection()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            SelectServices();
+        }
+        private void SelectAll()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             SelectServices();
@@ -401,6 +410,10 @@ namespace EasyRun.Views
                 case PubSubEventTypes.OnBeforeCloseProject:
                     OnBeforeCloseProject(solutionEvent.IsRemoved, solutionEvent.ProjectName);
                     break;
+
+                case PubSubEventTypes.OnStartupProjectChanged:
+                    OnStartupProjectChanged();
+                    break;
             }
         }
 
@@ -436,7 +449,6 @@ namespace EasyRun.Views
                 settingsManager.SyncWithVsServices(Model, vsServiceList);
             }
         }
-
 
         private void OnAfterRenameProject()
         {
@@ -478,6 +490,7 @@ namespace EasyRun.Views
         private void BeforeOpenSolution()
         {
             solutionIsOpening = true;
+            readyForSyncSelection = false;
         }
 
         private void AfterOpenSolution(bool forceReload)
@@ -554,6 +567,8 @@ namespace EasyRun.Views
 
         private void SelectServices()
         {
+            readyForSyncSelection = false;
+
             ThreadHelper.ThrowIfNotOnUIThread();
 
             Model.RaisePropertyChanged(nameof(Model.AllSelected));
@@ -573,11 +588,31 @@ namespace EasyRun.Views
                 else if (selectedServices.Length > 1)
                 {
                     dte.Solution.SolutionBuild.StartupProjects = selectedServices;
+                    readyForSyncSelection = true;
                 }
                 else
                 {
-                    Logger.LogActive("Please select at least one project/service.");
-                    return;
+                    readyForSyncSelection = true;
+                    OnStartupProjectChanged();
+                }
+            }
+            readyForSyncSelection = true;
+        }
+
+        private void OnStartupProjectChanged()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (readyForSyncSelection && Model.SelectedProfile != null && !Model.SelectedProfile.UseTye)
+            { 
+                if (dte.Solution.SolutionBuild.StartupProjects is object[] changedTo && changedTo.Length > 0)
+                {
+                    var selectedProjects = changedTo.Cast<string>().ToDictionary(k => Path.GetFileNameWithoutExtension(k), v => false);
+
+                    foreach (var service in Model.SelectedProfile.Services)
+                    {
+                        service.Selected = selectedProjects.ContainsKey(service.Name);
+                    }
                 }
             }
         }

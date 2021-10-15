@@ -9,6 +9,7 @@
         OnAfterRenameProject,
         OnAfterLoadProject,
         OnAfterOpenProject,
-        OnBeforeCloseProject
+        OnBeforeCloseProject,
+        OnStartupProjectChanged
     }
 }

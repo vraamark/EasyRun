@@ -7,7 +7,7 @@ namespace EasyRun.Settings
 {
     internal class GeneralOptions : BaseOptionModel<GeneralOptions>
     {
-        private Hub pubSub = Hub.Default;
+        private readonly Hub pubSub = Hub.Default;
 
         private bool autosaveSelectionsAsDefault;
 
@@ -25,5 +25,11 @@ namespace EasyRun.Settings
                 pubSub.Publish(new PubSubOptionChange(nameof(AutosaveSelectionsAsDefault), oldValue.ToString(), value.ToString()));
             }
         }
+
+        [Category("Profiles")]
+        [DisplayName("Sync with startup project selections")]
+        [Description("Selections will automatically change in current profile if startup projects are changed from solution explorer.")]
+        [DefaultValue(true)]
+        public bool SyncWithStartupProjects { get; set; } = true;
     }
 }
