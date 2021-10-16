@@ -670,14 +670,20 @@ namespace EasyRun.Views
             State.ShowInfoText = info;
             State.ShowInfo = true;
 
+            IDisposable timer = null;
+
             if (autoHide)
             {
-                Observable
+                timer = Observable
                     .Timer(TimeSpan.FromSeconds(7))
                     .ObserveOn(this)
                     .Subscribe(_ =>
                     {
                         State.ShowInfo = false;
+                        if (timer != null)
+                        {
+                            timer.Dispose();
+                        }
                     });
             }
         }
