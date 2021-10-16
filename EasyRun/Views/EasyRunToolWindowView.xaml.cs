@@ -196,6 +196,7 @@ namespace EasyRun.Views
         {
             State.Running = false;
             State.Stopping = false;
+            tyeManager.ResetDebuggerAttachedInfo(Model.SelectedProfile);
         }
 
         private void ServiceSelection()

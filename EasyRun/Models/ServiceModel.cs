@@ -17,12 +17,20 @@ namespace EasyRun.Models
         private string secretEnvVariables;
         private int replicas = 1;
         private ServiceType serviceType;
+        private bool debuggerIsAttached;
 
         [JsonTarget(JsonTargetType.Solution)]
         public ServiceType ServiceType
         {
             get { return serviceType; }
             set { SetProperty(ref serviceType, value); }
+        }
+
+        [JsonIgnore]
+        public bool DebuggerIsAttached
+        {
+            get { return debuggerIsAttached; }
+            set { SetProperty(ref debuggerIsAttached, value); }
         }
 
         [JsonTarget(JsonTargetType.Solution)]

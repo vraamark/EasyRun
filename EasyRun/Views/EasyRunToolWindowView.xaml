@@ -415,7 +415,8 @@
                                     </Grid.ColumnDefinitions>
                                     <imaging:CrispImage Grid.Column="0" Margin="0,0,6,0" Width="16" Height="16" Moniker="{Binding ServiceType, Converter={StaticResource MonikersConverter}}" />
                                     <Button
-                                        ap:DebuggerAttachedProperties.DebuggerAttached="False"
+                                        Visibility="{Binding State.Running, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibilityConverter}, ConverterParameter='Visible;Collapsed'}"
+                                        ap:DebuggerAttachedProperties.DebuggerAttached="{Binding DebuggerIsAttached}"
                                         Grid.Column="1"
                                         MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
                                         Margin="0,0,6,0"

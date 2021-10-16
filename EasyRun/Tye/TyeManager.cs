@@ -80,15 +80,7 @@ namespace EasyRun.Tye
                 foreach (var service in profile.FilteredServices.Where(w => w.Selected))
                 {
                     var projectFile = PathUtility.GetAbsolutePath(solutionPath, service.ProjectFile);
-                    string serviceName;
-                    if (string.IsNullOrEmpty(service.TyeName))
-                    {
-                        serviceName = service.Name.Replace(".", "-").ToLower();
-                    }
-                    else
-                    {
-                        serviceName = service.TyeName.Replace(".", "-").ToLower();
-                    }
+                    string serviceName = BuildTyeServiceName(service);
 
                     yaml.AppendFormat("- name: {0}", serviceName)
                         .AppendLine()
@@ -121,6 +113,8 @@ namespace EasyRun.Tye
         public void RunTye(DTE2 dte, ProfileModel profile, string yamlFilename, Action processStarted, Action processExited)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            ResetDebuggerAttachedInfo(profile);
 
             if (profile is null || !profile.UseTye)
             {
@@ -183,6 +177,29 @@ namespace EasyRun.Tye
             }
         }
 
+        public void ResetDebuggerAttachedInfo(ProfileModel profile)
+        {
+            if (profile != null)
+            {
+                foreach (var service in profile.Services)
+                {
+                    service.DebuggerIsAttached = false;
+                }
+            }
+        }
+
+        private string BuildTyeServiceName(ServiceModel service)
+        {
+            if (string.IsNullOrEmpty(service.TyeName))
+            {
+                return service.Name.Replace(".", "-").ToLower();
+            }
+            else
+            {
+                return service.TyeName.Replace(".", "-").ToLower();
+            }
+        }
+
         private int GetTyeHostPort(ProfileModel profile)
         {
             return profile?.TyePort == 0 ? 8000 : profile.TyePort;
@@ -203,11 +220,19 @@ namespace EasyRun.Tye
                     UnsubscribeTyeQuery();
 
                     await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                    var serviceDic = profile.Services.ToDictionary(k => BuildTyeServiceName(k), v => v);
+
                     foreach (Process2 process in dte.Debugger.LocalProcesses)
                     {
-                        if (pidDic.ContainsKey(process.ProcessID))
+                        if (pidDic.TryGetValue(process.ProcessID, out var replicaItem))
                         {
                             process.Attach();
+
+                            if (serviceDic.TryGetValue(replicaItem.ServiceName, out var service))
+                            {
+                                service.DebuggerIsAttached = true;
+                            }
                         }
                     }
 
@@ -218,15 +243,15 @@ namespace EasyRun.Tye
             return false;
         }
 
-        private Dictionary<int, string> GetPidList(List<TyeServiceDTO> tyeServices)
+        private Dictionary<int, ReplicaItem> GetPidList(List<TyeServiceDTO> tyeServices)
         {
-            var pidList = new Dictionary<int, string>();
+            var pidList = new Dictionary<int, ReplicaItem>();
 
             foreach (var service in tyeServices)
             {
                 foreach(var replica in service.Replicas.Values)
                 {
-                    pidList.Add(replica.Pid, replica.Name);
+                    pidList.Add(replica.Pid, new ReplicaItem { ServiceName = service.Description?.Name, ReplicaName = replica.Name });
                 }
             }
 

@@ -64,8 +64,10 @@
     <Compile Include="Settings\GeneralOptions.cs" />
     <Compile Include="Studio\VSProjects.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaState.cs" />
+    <Compile Include="Tye\DTOS\TyeDescriptionDTO.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaStatusDTO.cs" />
     <Compile Include="Tye\DTOS\TyeServiceType.cs" />
+    <Compile Include="Tye\ReplicaItem.cs" />
     <Compile Include="Tye\TyeHostApi.cs" />
     <Compile Include="Tye\DTOS\TyeServiceDTO.cs" />
     <Compile Include="Views\EditProfileView.xaml.cs">
