@@ -38,7 +38,7 @@ namespace EasyRun
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(EasyRunToolWindow))]
     [ProvideOptionPage(typeof(DialogPageProvider.General), "EasyRun", "General", 0, 0, true)]
-    public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents, IVsSelectionEvents
+    public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents, IVsSelectionEvents, IVsDebuggerEvents
     {
         private Hub pubSub = Hub.Default;
         private IVsSolution2 solution = null;
@@ -46,6 +46,9 @@ namespace EasyRun
 
         private IVsMonitorSelection monitorSelection = null;
         private uint selectionEventsCookie;
+
+        private IVsDebugger debugger;
+        private uint debuggerEventsCookie;
 
         protected override void Dispose(bool disposing)
         {
@@ -61,6 +64,11 @@ namespace EasyRun
             if (monitorSelection != null && selectionEventsCookie != 0)
             {
                 monitorSelection.UnadviseSelectionEvents(selectionEventsCookie);
+            }
+ 
+            if (debugger != null && debuggerEventsCookie != 0)
+            {
+                debugger.UnadviseDebuggerEvents(debuggerEventsCookie);
             }
         }
 
@@ -101,19 +109,21 @@ namespace EasyRun
             solution = await GetServiceAsync(typeof(SVsSolution)) as IVsSolution2;
             if (solution != null)
             {
-                // Register for solution events
+
                 solution.AdviseSolutionEvents(this, out solutionEventsCookie);
             }
 
             monitorSelection = await GetServiceAsync(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
             if (monitorSelection != null)
             {
-                // Remember debugging UI context cookie for later
-                //ms.GetCmdUIContextCookie(VSConstants.UICONTEXT.Debugging_guid, out debuggingCookie);
-                // Register for selection events
                 monitorSelection.AdviseSelectionEvents(this, out selectionEventsCookie);
             }
 
+            debugger = await GetServiceAsync(typeof(SVsShellDebugger)) as IVsDebugger;
+            if (debugger != null)
+            {
+                debugger.AdviseDebuggerEvents(this, out debuggerEventsCookie);
+            }
         }
 
         private async Task<bool> IsSolutionLoadedAsync()
@@ -293,6 +303,12 @@ namespace EasyRun
 
         public int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
         {
+            return VSConstants.S_OK;
+        }
+
+        public int OnModeChange(DBGMODE dbgmodeNew)
+        {
+            pubSub.Publish(new PubSubSolution(PubSubEventTypes.OnDebuggerModeChange) {DbgModeNew = dbgmodeNew });
             return VSConstants.S_OK;
         }
     }

@@ -10,6 +10,7 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Newtonsoft.Json;
 using PubSub;
 using System;
@@ -437,6 +438,18 @@ namespace EasyRun.Views
                 case PubSubEventTypes.OnStartupProjectChanged:
                     OnStartupProjectChanged();
                     break;
+
+                case PubSubEventTypes.OnDebuggerModeChange:
+                    OnDebuggerModeChange(solutionEvent.DbgModeNew);
+                    break;
+            }
+        }
+
+        private void OnDebuggerModeChange(DBGMODE dbgModeNew)
+        {
+            if (dbgModeNew == DBGMODE.DBGMODE_Design)
+            {
+                tyeManager.ResetDebuggerAttachedInfo(Model.SelectedProfile);
             }
         }
 
