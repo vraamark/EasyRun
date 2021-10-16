@@ -128,7 +128,7 @@ namespace EasyRun.Tye
                 Logger.LogActive("Select a Tye profile before running Tye.");
                 return;
             }
-            
+
             processExitedAction = processExited;
 
             tyeProcess = new System.Diagnostics.Process();
