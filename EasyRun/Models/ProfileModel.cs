@@ -1,4 +1,5 @@
 ﻿using EasyRun.Binding;
+using EasyRun.CustomAttributes;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,60 +39,70 @@ namespace EasyRun.Models
             set { SetProperty(ref name, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public LoggingTargetType LoggingTargetType
         {
             get { return loggingTargetType; }
             set { SetProperty(ref loggingTargetType, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string LoggingPath
         {
             get { return loggingPath; }
             set { SetProperty(ref loggingPath, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string LoggerUrl
         {
             get { return loggerUrl; }
             set { SetProperty(ref loggerUrl, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public bool UseTye
         {
             get { return useTye; }
             set { SetProperty(ref useTye, value); }
         }
 
+        [JsonTarget(JsonTargetType.User)]
         public bool AttachDebugger
         {
             get { return attachDebugger; }
             set { SetProperty(ref attachDebugger, value); }
         }
 
+        [JsonTarget(JsonTargetType.User)]
         public bool WaitOnAttachDebugger
         {
             get { return waitOnAttachDebugger; }
             set { SetProperty(ref waitOnAttachDebugger, value); }
         }
 
+        [JsonTarget(JsonTargetType.User)]
         public bool Watch
         {
             get { return watch; }
             set { SetProperty(ref watch, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public int TyePort
         {
             get { return tyePort; }
             set { SetProperty(ref tyePort, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public string Filter
         {
             get { return filter; }
             set { SetProperty(ref filter, value); }
         }
 
+        [JsonTarget(JsonTargetType.Solution)]
         public ObservableCollection<ServiceModel> Services
         {
             get { return services; }
@@ -115,7 +126,6 @@ namespace EasyRun.Models
                 {
                     Services.Add(service.Clone());
                 }
-
             }
             RefreshFilter();
 

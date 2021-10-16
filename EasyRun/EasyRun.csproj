@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Binding\BindableBase.cs" />
     <Compile Include="Binding\RelayCommand.cs" />
+    <Compile Include="CustomAttributes\JsonTargetAttribute.cs" />
+    <Compile Include="CustomAttributes\JsonTargetType.cs" />
     <Compile Include="Dialogs\DialogBase.cs" />
     <Compile Include="Dialogs\DialogWarningOkParameter.cs" />
     <Compile Include="Dialogs\DialogWarningYesNoParameter.cs" />
@@ -113,7 +115,7 @@
     <Compile Include="EasyRunPackage.cs" />
     <Compile Include="PubSubEvents\PubSubSolution.cs" />
     <Compile Include="PubSubEvents\PubSubEventTypes.cs" />
-    <Compile Include="Settings\IgnorePropertiesResolver.cs" />
+    <Compile Include="Settings\TargetPropertiesResolver.cs" />
     <Compile Include="Settings\PathUtility.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
     <Compile Include="Tye\TyeManager.cs" />
