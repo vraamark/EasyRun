@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AttachProperties\DebuggerAttachedProperties.cs" />
     <Compile Include="Binding\BindableBase.cs" />
     <Compile Include="Binding\RelayCommand.cs" />
     <Compile Include="CustomAttributes\JsonTargetAttribute.cs" />
@@ -102,7 +103,7 @@
     </Compile>
     <Compile Include="Exceptions\TyeManifestException.cs" />
     <Compile Include="Guids.cs" />
-    <Compile Include="KnownMonikers.cs" />
+    <Compile Include="CustomMonikers.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Models\EasyRunModel.cs" />
     <Compile Include="Models\LoggingTargetModel.cs" />

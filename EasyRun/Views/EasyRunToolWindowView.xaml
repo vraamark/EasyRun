@@ -7,6 +7,7 @@
              xmlns:converters="clr-namespace:EasyRun.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:ap="clr-namespace:EasyRun.AttachProperties"
              xmlns:controls="clr-namespace:EasyRun.Views"
              mc:Ignorable="d"
              xmlns:dm="clr-namespace:EasyRun.Models"
@@ -408,12 +409,27 @@
                                 <Grid Grid.Row="0" Margin="0,0,0,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <imaging:CrispImage Margin="0,0,6,0" Width="16" Height="16" Moniker="{Binding ServiceType, Converter={StaticResource MonikersConverter}}" />
-                                    <CheckBox
+                                    <imaging:CrispImage Grid.Column="0" Margin="0,0,6,0" Width="16" Height="16" Moniker="{Binding ServiceType, Converter={StaticResource MonikersConverter}}" />
+                                    <Button
+                                        ap:DebuggerAttachedProperties.DebuggerAttached="False"
                                         Grid.Column="1"
+                                        MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                                        Margin="0,0,6,0"
+                                        Command="{Binding SaveProfileCommand}"
+                                        Template="{DynamicResource DebugButtonTemplate}">
+                                        <Button.ToolTip>
+                                            <StackPanel>
+                                                <TextBlock>Attach/detach debugger</TextBlock>
+                                            </StackPanel>
+                                        </Button.ToolTip>
+                                    </Button>
+
+                                    <CheckBox
+                                        Grid.Column="2"
                                         IsEnabled="{Binding State.NotRunning, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         Content="{Binding Name}"
                                         IsChecked="{Binding Selected}"
@@ -422,7 +438,7 @@
                                         VerticalAlignment="Center">
                                     </CheckBox>
 
-                                    <ToggleButton Grid.Column="2" x:Name="expander" Template="{DynamicResource ExpanderButtonTemplate}" d:IsChecked="True"/>
+                                    <ToggleButton Grid.Column="3" x:Name="expander" Template="{DynamicResource ExpanderButtonTemplate}" d:IsChecked="True"/>
                                 </Grid>
 
                                 <!-- Configuration -->
