@@ -110,6 +110,13 @@ namespace EasyRun.Tye
             }
         }
 
+        public bool IsTyeHostRunning(ProfileModel profile)
+        {
+            var tyePort = GetTyeHostPort(profile);
+
+            return TyeHostApi.IsTyeHostRunning(tyePort);
+        }
+
         public void RunTye(DTE2 dte, ProfileModel profile, string yamlFilename, Action processStarted, Action processExited)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -121,7 +128,7 @@ namespace EasyRun.Tye
                 Logger.LogActive("Select a Tye profile before running Tye.");
                 return;
             }
-
+            
             processExitedAction = processExited;
 
             tyeProcess = new System.Diagnostics.Process();
@@ -200,7 +207,7 @@ namespace EasyRun.Tye
             }
         }
 
-        private int GetTyeHostPort(ProfileModel profile)
+        public int GetTyeHostPort(ProfileModel profile)
         {
             return profile?.TyePort == 0 ? 8000 : profile.TyePort;
         }
@@ -243,15 +250,53 @@ namespace EasyRun.Tye
             return false;
         }
 
-        private Dictionary<int, ReplicaItem> GetPidList(List<TyeServiceDTO> tyeServices)
+        public async System.Threading.Tasks.Task AttachDetachDebuggerAsync(DTE2 dte, ProfileModel profile, ServiceModel service)
+        {
+            var tyeServices = await TyeHostApi.GetTyeServicesAsync(GetTyeHostPort(profile));
+
+            if (tyeServices != null)
+            {
+                var pidDic = GetPidList(tyeServices, BuildTyeServiceName(service));
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                if (service.DebuggerIsAttached)
+                {
+                    foreach (Process2 process in dte.Debugger.DebuggedProcesses)
+                    {
+                        if (pidDic.TryGetValue(process.ProcessID, out var replicaItem))
+                        {
+                            process.Detach(false);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (Process2 process in dte.Debugger.LocalProcesses)
+                    {
+                        if (pidDic.TryGetValue(process.ProcessID, out var replicaItem))
+                        {
+                            process.Attach();
+                        }
+                    }
+                }
+
+                service.DebuggerIsAttached = !service.DebuggerIsAttached;
+            }
+        }
+
+        private Dictionary<int, ReplicaItem> GetPidList(List<TyeServiceDTO> tyeServices, string name = null)
         {
             var pidList = new Dictionary<int, ReplicaItem>();
 
             foreach (var service in tyeServices)
             {
-                foreach(var replica in service.Replicas.Values)
+                if (name is null || service.Description.Name == name)
                 {
-                    pidList.Add(replica.Pid, new ReplicaItem { ServiceName = service.Description?.Name, ReplicaName = replica.Name });
+                    foreach (var replica in service.Replicas.Values)
+                    {
+                        pidList.Add(replica.Pid, new ReplicaItem { ServiceName = service.Description?.Name, ReplicaName = replica.Name });
+                    }
                 }
             }
 
