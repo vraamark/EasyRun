@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AttachProperties\DebuggerAttachedProperties.cs" />
     <Compile Include="Binding\BindableBase.cs" />
     <Compile Include="Binding\RelayCommand.cs" />
     <Compile Include="CustomAttributes\JsonTargetAttribute.cs" />
@@ -63,8 +64,10 @@
     <Compile Include="Settings\GeneralOptions.cs" />
     <Compile Include="Studio\VSProjects.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaState.cs" />
+    <Compile Include="Tye\DTOS\TyeDescriptionDTO.cs" />
     <Compile Include="Tye\DTOS\TyeReplicaStatusDTO.cs" />
     <Compile Include="Tye\DTOS\TyeServiceType.cs" />
+    <Compile Include="Tye\ReplicaItem.cs" />
     <Compile Include="Tye\TyeHostApi.cs" />
     <Compile Include="Tye\DTOS\TyeServiceDTO.cs" />
     <Compile Include="Views\EditProfileView.xaml.cs">
@@ -102,7 +105,7 @@
     </Compile>
     <Compile Include="Exceptions\TyeManifestException.cs" />
     <Compile Include="Guids.cs" />
-    <Compile Include="KnownMonikers.cs" />
+    <Compile Include="CustomMonikers.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Models\EasyRunModel.cs" />
     <Compile Include="Models\LoggingTargetModel.cs" />

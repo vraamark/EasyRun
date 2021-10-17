@@ -153,3 +153,10 @@ them.
 
 Here you can define how many replicas (instances) of the service you want to run
 simultaneously.
+
+### Tye service attach/detach debugger
+
+When Tye is running it is possible to attach and detach the debugger to individual services
+using the little bug icon.
+
+![Tye service debugging](Doc/Tye-service-attach-debugger.png)

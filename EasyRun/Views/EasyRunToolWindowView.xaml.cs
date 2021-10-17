@@ -10,6 +10,7 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Newtonsoft.Json;
 using PubSub;
 using System;
@@ -55,7 +56,8 @@ namespace EasyRun.Views
         public RelayCommand SelectAllCommand { get; set; }
         public RelayCommand HideInfoCommand { get; set; }
         public RelayCommand SaveSelectionsAsDefaultCommand { get; set; }
-        
+        public RelayCommand AttachDetachDebuggerCommand { get; set; }
+
         public EasyRunToolWindowView()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -93,6 +95,7 @@ namespace EasyRun.Views
             SelectAllCommand = new RelayCommand(_ => SelectAll());
             HideInfoCommand = new RelayCommand(_ => HideInfo());
             SaveSelectionsAsDefaultCommand = new RelayCommand(_ => SaveSelectionsAsDefault());
+            AttachDetachDebuggerCommand = new RelayCommand(parameter => AttachDetachDebugger(parameter as ServiceModel));
 
             if (!settingsManager.IsLoaded())
             {
@@ -171,6 +174,12 @@ namespace EasyRun.Views
 
             settingsManager.SaveProfiles(Model);
 
+            if (tyeManager.IsTyeHostRunning(Model.SelectedProfile))
+            {
+                this.ShowWarningOkDialog("Already running", $"Tye host is already running on port {tyeManager.GetTyeHostPort(Model.SelectedProfile)}");
+                return;
+            }
+
             var yamlFilename = tyeManager.BuildTyeManifest(dte, Model.SelectedProfile, instanceId);
 
             if (string.IsNullOrEmpty(yamlFilename))
@@ -196,6 +205,7 @@ namespace EasyRun.Views
         {
             State.Running = false;
             State.Stopping = false;
+            tyeManager.ResetDebuggerAttachedInfo(Model.SelectedProfile);
         }
 
         private void ServiceSelection()
@@ -236,6 +246,20 @@ namespace EasyRun.Views
             else
             {
                 ShowInfo("Nothing new to save.", true);
+            }
+        }
+
+        private void AttachDetachDebugger(ServiceModel service)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (service != null)
+            {
+                ThreadHelper.JoinableTaskFactory.Run(async delegate
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    await tyeManager.AttachDetachDebuggerAsync(dte, Model.SelectedProfile, service);
+                });
             }
         }
 
@@ -414,6 +438,18 @@ namespace EasyRun.Views
                 case PubSubEventTypes.OnStartupProjectChanged:
                     OnStartupProjectChanged();
                     break;
+
+                case PubSubEventTypes.OnDebuggerModeChange:
+                    OnDebuggerModeChange(solutionEvent.DbgModeNew);
+                    break;
+            }
+        }
+
+        private void OnDebuggerModeChange(DBGMODE dbgModeNew)
+        {
+            if (dbgModeNew == DBGMODE.DBGMODE_Design)
+            {
+                tyeManager.ResetDebuggerAttachedInfo(Model.SelectedProfile);
             }
         }
 
@@ -634,14 +670,20 @@ namespace EasyRun.Views
             State.ShowInfoText = info;
             State.ShowInfo = true;
 
+            IDisposable timer = null;
+
             if (autoHide)
             {
-                Observable
+                timer = Observable
                     .Timer(TimeSpan.FromSeconds(7))
                     .ObserveOn(this)
                     .Subscribe(_ =>
                     {
                         State.ShowInfo = false;
+                        if (timer != null)
+                        {
+                            timer.Dispose();
+                        }
                     });
             }
         }

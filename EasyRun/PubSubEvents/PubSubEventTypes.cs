@@ -10,6 +10,7 @@
         OnAfterLoadProject,
         OnAfterOpenProject,
         OnBeforeCloseProject,
-        OnStartupProjectChanged
+        OnStartupProjectChanged,
+        OnDebuggerModeChange
     }
 }
