@@ -2,8 +2,10 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 namespace EasyRun.Tye
@@ -61,6 +63,21 @@ namespace EasyRun.Tye
             {
                 return false;
             }
+        }
+
+        public static bool IsTyeHostRunning(int tyeHostPort)
+        {
+            IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+
+            foreach (IPEndPoint endPoint in ipProperties.GetActiveTcpListeners())
+            {
+                if (endPoint.Port == tyeHostPort)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

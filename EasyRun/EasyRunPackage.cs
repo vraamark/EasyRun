@@ -1,6 +1,8 @@
 ﻿using EasyRun.Logging;
 using EasyRun.PubSubEvents;
+using EasyRun.Settings;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -35,11 +37,18 @@ namespace EasyRun
     [Guid("e4568a5d-446c-4d1e-b30a-9b1ef8625ffd")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(EasyRunToolWindow))]
-    public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents
+    [ProvideOptionPage(typeof(DialogPageProvider.General), "EasyRun", "General", 0, 0, true)]
+    public sealed class EasyRunPackage : AsyncPackage, IVsSolutionEvents, IVsSolutionEvents4, IVsSolutionLoadEvents, IVsSelectionEvents, IVsDebuggerEvents
     {
         private Hub pubSub = Hub.Default;
         private IVsSolution2 solution = null;
         private uint solutionEventsCookie;
+
+        private IVsMonitorSelection monitorSelection = null;
+        private uint selectionEventsCookie;
+
+        private IVsDebugger debugger;
+        private uint debuggerEventsCookie;
 
         protected override void Dispose(bool disposing)
         {
@@ -50,6 +59,16 @@ namespace EasyRun
             if (solution != null && solutionEventsCookie != 0)
             {
                 solution.UnadviseSolutionEvents(solutionEventsCookie);
+            }
+
+            if (monitorSelection != null && selectionEventsCookie != 0)
+            {
+                monitorSelection.UnadviseSelectionEvents(selectionEventsCookie);
+            }
+ 
+            if (debugger != null && debuggerEventsCookie != 0)
+            {
+                debugger.UnadviseDebuggerEvents(debuggerEventsCookie);
             }
         }
 
@@ -64,7 +83,9 @@ namespace EasyRun
         {
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            var dte = (EnvDTE.DTE)GetGlobalService(typeof(EnvDTE.DTE));
+            var dte = GetGlobalService(typeof(DTE)) as DTE2;
+            Assumes.Present(dte);
+
             IVsOutputWindow outputWindow = await GetServiceAsync(typeof(SVsOutputWindow)) as IVsOutputWindow;
             var outputWindow2 = dte.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
             Logger.Initialize(outputWindow, outputWindow2);
@@ -77,7 +98,7 @@ namespace EasyRun
             }
 
             await AdviseEventsAsync();
-            
+
             await EasyRunToolWindowCommand.InitializeAsync(this);
         }
 
@@ -88,8 +109,20 @@ namespace EasyRun
             solution = await GetServiceAsync(typeof(SVsSolution)) as IVsSolution2;
             if (solution != null)
             {
-                // Register for solution events
+
                 solution.AdviseSolutionEvents(this, out solutionEventsCookie);
+            }
+
+            monitorSelection = await GetServiceAsync(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
+            if (monitorSelection != null)
+            {
+                monitorSelection.AdviseSelectionEvents(this, out selectionEventsCookie);
+            }
+
+            debugger = await GetServiceAsync(typeof(SVsShellDebugger)) as IVsDebugger;
+            if (debugger != null)
+            {
+                debugger.AdviseDebuggerEvents(this, out debuggerEventsCookie);
             }
         }
 
@@ -247,6 +280,35 @@ namespace EasyRun
         public int OnAfterBackgroundSolutionLoadComplete()
         {
             HandleOpenSolution();
+            return VSConstants.S_OK;
+        }
+
+        public int OnSelectionChanged(IVsHierarchy pHierOld, uint itemidOld, IVsMultiItemSelect pMISOld, ISelectionContainer pSCOld, IVsHierarchy pHierNew, uint itemidNew, IVsMultiItemSelect pMISNew, ISelectionContainer pSCNew)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnElementValueChanged(uint elementid, object varValueOld, object varValueNew)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (elementid == (uint)VSConstants.VSSELELEMID.SEID_StartupProject)
+            {
+                if (GeneralOptions.Instance.SyncWithStartupProjects)
+                {
+                    pubSub.Publish(new PubSubSolution(PubSubEventTypes.OnStartupProjectChanged));
+                }
+            }
+            return VSConstants.S_OK;
+        }
+
+        public int OnCmdUIContextChanged(uint dwCmdUICookie, int fActive)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnModeChange(DBGMODE dbgmodeNew)
+        {
+            pubSub.Publish(new PubSubSolution(PubSubEventTypes.OnDebuggerModeChange) {DbgModeNew = dbgmodeNew });
             return VSConstants.S_OK;
         }
     }

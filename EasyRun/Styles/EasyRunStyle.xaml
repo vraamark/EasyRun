@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary x:Class="EasyRun.Styles"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ap="clr-namespace:EasyRun.AttachProperties"
                     xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
                     xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"                                 
                     xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0">
@@ -85,4 +86,54 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
+    <!-- Hyperlink button -->
+    <Style x:Key="EasyRunHyperlink" TargetType="{x:Type Hyperlink}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.WindowTextKey}}" />
+        <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarHoverKey}}" />
+                <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Debug button -->
+    <ControlTemplate x:Key="DebugButtonTemplate" TargetType="{x:Type Button}">
+        <Border x:Name="border" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0">
+            <Grid>
+                <Canvas x:Name="debugIconAttached" Width="16" Height="16" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                    <Path Fill="#FFB82A2A" Data="F1 M16,16z M0,0z M11.579,3.825C11.479,3.663 11.373,3.507 11.261,3.356 10.336,2.123 9.092,1.444 7.758,1.444 6.423,1.444 5.179,2.123 4.255,3.356 4.142,3.507 4.036,3.663 3.936,3.825 4.656,4.973 6.099,5.757 7.758,5.757 9.416,5.757 10.859,4.973 11.579,3.825z"/>
+                    <Path Fill="#FFB82A2A" Data="F1 M16,16z M0,0z M14.977,7.238L12.623,7.238C12.594,6.787,12.529,6.346,12.429,5.92L14.28,4.07C14.49,3.86 14.49,3.519 14.28,3.309 14.069,3.099 13.729,3.099 13.519,3.309L12.587,4.24C12.323,4.701 11.97,5.125 11.533,5.497 10.65,6.249 9.516,6.707 8.296,6.811L8.296,14.071C9.424,13.914 10.461,13.262 11.261,12.197 11.401,12.01 11.531,11.813 11.651,11.608L13.519,13.476C13.624,13.581 13.761,13.634 13.899,13.634 14.037,13.634 14.175,13.581 14.28,13.476 14.49,13.266 14.49,12.925 14.28,12.715L12.142,10.577C12.409,9.875,12.572,9.109,12.623,8.315L14.977,8.315C15.274,8.315 15.515,8.074 15.515,7.776 15.515,7.479 15.274,7.238 14.977,7.238z"/>
+                    <Path Fill="#FFB82A2A" Data="F1 M16,16z M0,0z M7.219,6.811C6,6.707 4.866,6.249 3.982,5.497 3.545,5.126 3.192,4.701 2.928,4.24L1.997,3.309C1.786,3.099 1.446,3.099 1.235,3.309 1.025,3.519 1.025,3.86 1.235,4.07L3.086,5.92C2.986,6.346,2.921,6.787,2.892,7.238L0.538,7.238C0.241,7.238 0,7.479 0,7.776 0,8.074 0.241,8.315 0.538,8.315L2.892,8.315C2.943,9.109,3.107,9.875,3.373,10.577L1.235,12.715C1.025,12.925 1.025,13.266 1.235,13.476 1.446,13.686 1.786,13.686 1.997,13.476L3.864,11.608C3.984,11.813 4.114,12.01 4.255,12.197 5.054,13.262 6.091,13.914 7.219,14.071L7.219,6.811z"/>
+                </Canvas>
+                <Canvas x:Name="debugIconDetached" Width="16" Height="16" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+                    <Path Fill="#FF10A010" Data="F1 M16,16z M0,0z M11.579,3.825C11.479,3.663 11.373,3.507 11.261,3.356 10.336,2.123 9.092,1.444 7.758,1.444 6.423,1.444 5.179,2.123 4.255,3.356 4.142,3.507 4.036,3.663 3.936,3.825 4.656,4.973 6.099,5.757 7.758,5.757 9.416,5.757 10.859,4.973 11.579,3.825z"/>
+                    <Path Fill="#FF10A010" Data="F1 M16,16z M0,0z M14.977,7.238L12.623,7.238C12.594,6.787,12.529,6.346,12.429,5.92L14.28,4.07C14.49,3.86 14.49,3.519 14.28,3.309 14.069,3.099 13.729,3.099 13.519,3.309L12.587,4.24C12.323,4.701 11.97,5.125 11.533,5.497 10.65,6.249 9.516,6.707 8.296,6.811L8.296,14.071C9.424,13.914 10.461,13.262 11.261,12.197 11.401,12.01 11.531,11.813 11.651,11.608L13.519,13.476C13.624,13.581 13.761,13.634 13.899,13.634 14.037,13.634 14.175,13.581 14.28,13.476 14.49,13.266 14.49,12.925 14.28,12.715L12.142,10.577C12.409,9.875,12.572,9.109,12.623,8.315L14.977,8.315C15.274,8.315 15.515,8.074 15.515,7.776 15.515,7.479 15.274,7.238 14.977,7.238z"/>
+                    <Path Fill="#FF10A010" Data="F1 M16,16z M0,0z M7.219,6.811C6,6.707 4.866,6.249 3.982,5.497 3.545,5.126 3.192,4.701 2.928,4.24L1.997,3.309C1.786,3.099 1.446,3.099 1.235,3.309 1.025,3.519 1.025,3.86 1.235,4.07L3.086,5.92C2.986,6.346,2.921,6.787,2.892,7.238L0.538,7.238C0.241,7.238 0,7.479 0,7.776 0,8.074 0.241,8.315 0.538,8.315L2.892,8.315C2.943,9.109,3.107,9.875,3.373,10.577L1.235,12.715C1.025,12.925 1.025,13.266 1.235,13.476 1.446,13.686 1.786,13.686 1.997,13.476L3.864,11.608C3.984,11.813 4.114,12.01 4.255,12.197 5.054,13.262 6.091,13.914 7.219,14.071L7.219,6.811z"/>
+                </Canvas>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsDefaulted" Value="True">
+                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarHoverKey}}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" TargetName="border" Value="{DynamicResource {x:Static vsshell:VsBrushes.CommandBarMouseDownBackgroundMiddleKey}}"/>
+            </Trigger>
+            <Trigger Property="ap:DebuggerAttachedProperties.DebuggerAttached" Value="True">
+                <Setter Property="Visibility" TargetName="debugIconAttached" Value="Visible"/>
+                <Setter Property="Visibility" TargetName="debugIconDetached" Value="Hidden"/>
+            </Trigger>
+            <Trigger Property="ap:DebuggerAttachedProperties.DebuggerAttached" Value="False">
+                <Setter Property="Visibility" TargetName="debugIconAttached" Value="Hidden"/>
+                <Setter Property="Visibility" TargetName="debugIconDetached" Value="Visible"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    
 </ResourceDictionary>

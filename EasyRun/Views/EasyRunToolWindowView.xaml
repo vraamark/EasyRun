@@ -7,6 +7,7 @@
              xmlns:converters="clr-namespace:EasyRun.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vsshell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+             xmlns:ap="clr-namespace:EasyRun.AttachProperties"
              xmlns:controls="clr-namespace:EasyRun.Views"
              mc:Ignorable="d"
              xmlns:dm="clr-namespace:EasyRun.Models"
@@ -329,13 +330,30 @@
             </Grid>
 
             <Grid Margin="8,16,8,8" Grid.Row="2">
-                <CheckBox
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox
                     IsEnabled="{Binding State.NotRunning}"
                     Content="Select all"
                     IsChecked="{Binding Model.AllSelected}"
                     Style="{DynamicResource {x:Static vsshell:VsResourceKeys.CheckBoxStyleKey}}"
+                    Command="{Binding SelectAllCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     VerticalAlignment="Center">
-                </CheckBox>
+                    </CheckBox>
+                    <!--<Button
+                        Content="Save selection as default"
+                        Margin="8,0,0,0"
+                        Grid.Column="2"
+                        Width="150"
+                        MinHeight="22"
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource {x:Static vsshell:VsResourceKeys.ButtonStyleKey}}"
+                        Command="{Binding ShowDashboardCommand}"
+                        HorizontalAlignment="Left"/>-->
+
+                    <TextBlock Visibility="{Binding State.AutosaveSelectionsAsDefault, Converter={StaticResource VisibilityConverter}, ConverterParameter='Collapsed;Visible'}" Margin="16,0,0,0" VerticalAlignment="Center">
+                        <Hyperlink  Command="{Binding SaveSelectionsAsDefaultCommand}">Save current selections as default</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
 
                 <!-- Image (Docker) and Exe files.
                 <StackPanel Visibility="{Binding Model.SelectedProfile.UseTye, Converter={StaticResource VisibilityConverter}, ConverterParameter='Visible;Collapsed'}" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -391,12 +409,28 @@
                                 <Grid Grid.Row="0" Margin="0,0,0,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <imaging:CrispImage Margin="0,0,6,0" Width="16" Height="16" Moniker="{Binding ServiceType, Converter={StaticResource MonikersConverter}}" />
-                                    <CheckBox
+                                    <imaging:CrispImage Grid.Column="0" Margin="0,0,6,0" Width="16" Height="16" Moniker="{Binding ServiceType, Converter={StaticResource MonikersConverter}}" />
+                                    <Button
+                                        Visibility="{Binding State.Running, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource VisibilityConverter}, ConverterParameter='Visible;Collapsed'}"
+                                        ap:DebuggerAttachedProperties.DebuggerAttached="{Binding DebuggerIsAttached}"
                                         Grid.Column="1"
+                                        MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                                        Margin="0,0,6,0"
+                                        Command="{Binding AttachDetachDebuggerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                        Template="{DynamicResource DebugButtonTemplate}">
+                                        <Button.ToolTip>
+                                            <StackPanel>
+                                                <TextBlock>Attach/detach debugger</TextBlock>
+                                            </StackPanel>
+                                        </Button.ToolTip>
+                                    </Button>
+
+                                    <CheckBox
+                                        Grid.Column="2"
                                         IsEnabled="{Binding State.NotRunning, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         Content="{Binding Name}"
                                         IsChecked="{Binding Selected}"
@@ -405,7 +439,7 @@
                                         VerticalAlignment="Center">
                                     </CheckBox>
 
-                                    <ToggleButton Grid.Column="2" x:Name="expander" Template="{DynamicResource ExpanderButtonTemplate}" d:IsChecked="True"/>
+                                    <ToggleButton Grid.Column="3" x:Name="expander" Template="{DynamicResource ExpanderButtonTemplate}" d:IsChecked="True"/>
                                 </Grid>
 
                                 <!-- Configuration -->

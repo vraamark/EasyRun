@@ -10,10 +10,12 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Newtonsoft.Json;
 using PubSub;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
@@ -28,9 +30,10 @@ namespace EasyRun.Views
         private readonly DTE2 dte;
         private readonly SettingsManager settingsManager = new SettingsManager();
         private readonly TyeManager tyeManager = new TyeManager();
-        private bool solutionIsOpening;
+        private readonly Hub pubSub = Hub.Default;
 
-        private Hub pubSub = Hub.Default;
+        private bool solutionIsOpening;
+        private bool readyForSyncSelection;
 
         private List<ServiceModel> vsServiceList = new List<ServiceModel>();
         private IObservable<string> textChangedObservable;
@@ -50,13 +53,19 @@ namespace EasyRun.Views
         public RelayCommand StopCommand { get; set; }
         public RelayCommand ShowDashboardCommand { get; set; }
         public RelayCommand ServiceSelectionCommand { get; set; }
+        public RelayCommand SelectAllCommand { get; set; }
         public RelayCommand HideInfoCommand { get; set; }
+        public RelayCommand SaveSelectionsAsDefaultCommand { get; set; }
+        public RelayCommand AttachDetachDebuggerCommand { get; set; }
 
         public EasyRunToolWindowView()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            
             this.InitializeComponent();
 
             DataContext = this;
+            State.AutosaveSelectionsAsDefault = GeneralOptions.Instance.AutosaveSelectionsAsDefault;
 
             dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
             Assumes.Present(dte);
@@ -69,11 +78,9 @@ namespace EasyRun.Views
 
             textChangedObservable.Subscribe(FilterChanged);
 
-            pubSub.Subscribe<PubSubSolution>(this, solutionEvent =>
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                SolutionEvents(solutionEvent);
-            });
+            pubSub.Subscribe<PubSubSolution>(this, solutionEvent => SolutionEvents(solutionEvent));
+            pubSub.Subscribe<PubSubOptionChange>(this, change => VisualStudioOptionsChange(change));
+            pubSub.Subscribe<PubSubFileMonitor>(this, change => FileMonitorChange(change));
 
             AddDockerCommand = new RelayCommand(_ => AddDocker());
             SaveProfileCommand = new RelayCommand(_ => SaveProfile());
@@ -85,7 +92,10 @@ namespace EasyRun.Views
             StopCommand = new RelayCommand(_ => Stop());
             ShowDashboardCommand = new RelayCommand(_ => ShowDashboard());
             ServiceSelectionCommand = new RelayCommand(_ => ServiceSelection());
+            SelectAllCommand = new RelayCommand(_ => SelectAll());
             HideInfoCommand = new RelayCommand(_ => HideInfo());
+            SaveSelectionsAsDefaultCommand = new RelayCommand(_ => SaveSelectionsAsDefault());
+            AttachDetachDebuggerCommand = new RelayCommand(parameter => AttachDetachDebugger(parameter as ServiceModel));
 
             if (!settingsManager.IsLoaded())
             {
@@ -93,9 +103,37 @@ namespace EasyRun.Views
             }
         }
 
+        private void VisualStudioOptionsChange(PubSubOptionChange change)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            if (change.OptionId.Equals(nameof(GeneralOptions.AutosaveSelectionsAsDefault)))
+            {
+                var newValue = bool.Parse(change.NewValue);
+                if (State.AutosaveSelectionsAsDefault != newValue)
+                {
+                    State.AutosaveSelectionsAsDefault = newValue;
+                }
+            }
+        }
+
+        private void FileMonitorChange(PubSubFileMonitor change)
+        {
+            if (change.Id.Equals("settings"))
+            {
+                ThreadHelper.JoinableTaskFactory.Run(async delegate
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    AfterOpenSolution(true);
+                    ShowInfo("Settingsfile reloaded", true);
+                });
+            }
+        }
+
         private void Run()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            settingsManager.SaveProfiles(Model);
 
             if (Model.SelectedProfile?.UseTye == true)
             {
@@ -136,6 +174,12 @@ namespace EasyRun.Views
 
             settingsManager.SaveProfiles(Model);
 
+            if (tyeManager.IsTyeHostRunning(Model.SelectedProfile))
+            {
+                this.ShowWarningOkDialog("Already running", $"Tye host is already running on port {tyeManager.GetTyeHostPort(Model.SelectedProfile)}");
+                return;
+            }
+
             var yamlFilename = tyeManager.BuildTyeManifest(dte, Model.SelectedProfile, instanceId);
 
             if (string.IsNullOrEmpty(yamlFilename))
@@ -161,9 +205,15 @@ namespace EasyRun.Views
         {
             State.Running = false;
             State.Stopping = false;
+            tyeManager.ResetDebuggerAttachedInfo(Model.SelectedProfile);
         }
 
         private void ServiceSelection()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            SelectServices();
+        }
+        private void SelectAll()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             SelectServices();
@@ -181,6 +231,35 @@ namespace EasyRun.Views
             else
             {
                 ShowInfo("Nothing new to save.", true);
+            }
+        }
+
+        private void SaveSelectionsAsDefault()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            bool success = settingsManager.SaveSelectionsAsDefault(Model, Model.SelectedProfile);
+            if (success)
+            {
+                ShowInfo("Profile defaults was saved.", true);
+            }
+            else
+            {
+                ShowInfo("Nothing new to save.", true);
+            }
+        }
+
+        private void AttachDetachDebugger(ServiceModel service)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (service != null)
+            {
+                ThreadHelper.JoinableTaskFactory.Run(async delegate
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    await tyeManager.AttachDetachDebuggerAsync(dte, Model.SelectedProfile, service);
+                });
             }
         }
 
@@ -355,6 +434,22 @@ namespace EasyRun.Views
                 case PubSubEventTypes.OnBeforeCloseProject:
                     OnBeforeCloseProject(solutionEvent.IsRemoved, solutionEvent.ProjectName);
                     break;
+
+                case PubSubEventTypes.OnStartupProjectChanged:
+                    OnStartupProjectChanged();
+                    break;
+
+                case PubSubEventTypes.OnDebuggerModeChange:
+                    OnDebuggerModeChange(solutionEvent.DbgModeNew);
+                    break;
+            }
+        }
+
+        private void OnDebuggerModeChange(DBGMODE dbgModeNew)
+        {
+            if (dbgModeNew == DBGMODE.DBGMODE_Design)
+            {
+                tyeManager.ResetDebuggerAttachedInfo(Model.SelectedProfile);
             }
         }
 
@@ -390,7 +485,6 @@ namespace EasyRun.Views
                 settingsManager.SyncWithVsServices(Model, vsServiceList);
             }
         }
-
 
         private void OnAfterRenameProject()
         {
@@ -432,6 +526,7 @@ namespace EasyRun.Views
         private void BeforeOpenSolution()
         {
             solutionIsOpening = true;
+            readyForSyncSelection = false;
         }
 
         private void AfterOpenSolution(bool forceReload)
@@ -508,6 +603,8 @@ namespace EasyRun.Views
 
         private void SelectServices()
         {
+            readyForSyncSelection = false;
+
             ThreadHelper.ThrowIfNotOnUIThread();
 
             Model.RaisePropertyChanged(nameof(Model.AllSelected));
@@ -527,11 +624,31 @@ namespace EasyRun.Views
                 else if (selectedServices.Length > 1)
                 {
                     dte.Solution.SolutionBuild.StartupProjects = selectedServices;
+                    readyForSyncSelection = true;
                 }
                 else
                 {
-                    Logger.LogActive("Please select at least one project/service.");
-                    return;
+                    readyForSyncSelection = true;
+                    OnStartupProjectChanged();
+                }
+            }
+            readyForSyncSelection = true;
+        }
+
+        private void OnStartupProjectChanged()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (readyForSyncSelection && Model.SelectedProfile != null && !Model.SelectedProfile.UseTye)
+            { 
+                if (dte.Solution.SolutionBuild.StartupProjects is object[] changedTo && changedTo.Length > 0)
+                {
+                    var selectedProjects = changedTo.Cast<string>().ToDictionary(k => Path.GetFileNameWithoutExtension(k), v => false);
+
+                    foreach (var service in Model.SelectedProfile.Services)
+                    {
+                        service.Selected = selectedProjects.ContainsKey(service.Name);
+                    }
                 }
             }
         }
@@ -553,14 +670,20 @@ namespace EasyRun.Views
             State.ShowInfoText = info;
             State.ShowInfo = true;
 
+            IDisposable timer = null;
+
             if (autoHide)
             {
-                Observable
+                timer = Observable
                     .Timer(TimeSpan.FromSeconds(7))
                     .ObserveOn(this)
                     .Subscribe(_ =>
                     {
                         State.ShowInfo = false;
+                        if (timer != null)
+                        {
+                            timer.Dispose();
+                        }
                     });
             }
         }

@@ -1,4 +1,6 @@
-﻿namespace EasyRun.PubSubEvents
+﻿using Microsoft.VisualStudio.Shell.Interop;
+
+namespace EasyRun.PubSubEvents
 {
     public class PubSubSolution
     {
@@ -22,5 +24,7 @@
         public bool IsRemoved { get; set; }
 
         public string ProjectName { get; set; }
+
+        public DBGMODE DbgModeNew { get; set; }
     }
 }
