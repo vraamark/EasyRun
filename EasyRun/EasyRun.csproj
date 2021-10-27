@@ -161,7 +161,10 @@
       <Version>16.0.75.103</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.206" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.10.1056" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.4207-preview4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="PubSub">
       <Version>4.0.1</Version>
     </PackageReference>
