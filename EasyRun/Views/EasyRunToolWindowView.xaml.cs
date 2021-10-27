@@ -61,7 +61,7 @@ namespace EasyRun.Views
         public EasyRunToolWindowView()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            
+
             this.InitializeComponent();
 
             DataContext = this;
@@ -624,14 +624,20 @@ namespace EasyRun.Views
                 else if (selectedServices.Length > 1)
                 {
                     dte.Solution.SolutionBuild.StartupProjects = selectedServices;
-                    readyForSyncSelection = true;
                 }
                 else
                 {
-                    readyForSyncSelection = true;
-                    OnStartupProjectChanged();
+                    // We cannot have zero selected projects.
+                    var firstService = Model.SelectedProfile.FilteredServices.FirstOrDefault();
+
+                    if (firstService != null)
+                    {
+                        firstService.Selected = true;
+                        dte.Solution.SolutionBuild.StartupProjects = (object)firstService.ProjectFile;
+                    }
                 }
             }
+
             readyForSyncSelection = true;
         }
 
