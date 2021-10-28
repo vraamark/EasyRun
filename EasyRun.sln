@@ -3,14 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRun", "EasyRun\EasyRun.csproj", "{7CFAC78F-0D55-4FB8-9E7C-E636F6F82D34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRun2019", "EasyRun2019\EasyRun2019.csproj", "{7CFAC78F-0D55-4FB8-9E7C-E636F6F82D34}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0FBDC752-30EE-4FAA-A4A4-E00EF8B79F46}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EasyRunShared", "EasyRunShared\EasyRunShared.shproj", "{B3155DBE-C026-4D0C-8A3E-5363848CF0C5}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		EasyRunShared\EasyRunShared.projitems*{7cfac78f-0d55-4fb8-9e7c-e636f6f82d34}*SharedItemsImports = 4
+		EasyRunShared\EasyRunShared.projitems*{b3155dbe-c026-4d0c-8a3e-5363848cf0c5}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
