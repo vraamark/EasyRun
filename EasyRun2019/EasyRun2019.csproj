@@ -65,11 +65,11 @@
       <ResourceName>Menus.ctmenu</ResourceName>
       <LastGenOutput>EasyRunPackage1.cs</LastGenOutput>
     </VSCTCompile>
-    <Content Include="..\EasyRunSharedResources\CustomImages.vsct">
+    <VSCTCompile Include="..\EasyRunSharedResources\CustomImages.vsct">
       <Link>CustomImages.vsct</Link>
       <Generator>VsctGenerator</Generator>
       <LastGenOutput>CustomImages.cs</LastGenOutput>
-    </Content>
+    </VSCTCompile>
     <Content Include="..\EasyRunSharedResources\Icon.16x16.png">
       <Link>Resources\Icon.16x16.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
