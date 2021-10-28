@@ -6,7 +6,7 @@
  -->
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
   <Symbols>
-    <GuidSymbol name="CustomImages" value="{584846ed-c810-497b-9b10-06087689849e}">
+    <GuidSymbol name="CustomImages" value="{bc7e4569-9a33-4f8b-a9a4-d02b69606d1a}">
       <IDSymbol name="EasyRun" value="1" />
     </GuidSymbol>
   </Symbols>

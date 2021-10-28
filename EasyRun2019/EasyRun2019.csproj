@@ -77,13 +77,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\EasyRunSharedResources\Monikers.imagemanifest">
-      <Link>Monikers.imagemanifest</Link>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="..\LICENSE">
       <Link>Resources\LICENSE</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Monikers.imagemanifest">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="source.extension.vsixmanifest">
@@ -121,12 +120,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\EasyRunSharedResources\Icon.xaml">
+    <Content Include="..\EasyRunSharedResources\Icon.xaml">
       <Link>Resources\Icon.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Page>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <Import Project="..\EasyRunShared\EasyRunShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

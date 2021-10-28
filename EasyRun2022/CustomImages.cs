@@ -12,7 +12,7 @@ namespace EasyRun2022
     /// </summary>
     internal sealed partial class PackageGuids
     {
-        public const string CustomImagesString = "584846ed-c810-497b-9b10-06087689849e";
+        public const string CustomImagesString = "bc7e4569-9a33-4f8b-a9a4-d02b69606d1a";
         public static Guid CustomImages = new Guid(CustomImagesString);
     }
     /// <summary>
