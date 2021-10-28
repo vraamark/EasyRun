@@ -12,8 +12,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EasyRunShared", "EasyRunShared\EasyRunShared.shproj", "{B3155DBE-C026-4D0C-8A3E-5363848CF0C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyRun2022", "EasyRun2022\EasyRun2022.csproj", "{40AAF642-C45B-4243-8F3B-125DA3DE7E3C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		EasyRunShared\EasyRunShared.projitems*{40aaf642-c45b-4243-8f3b-125da3de7e3c}*SharedItemsImports = 4
 		EasyRunShared\EasyRunShared.projitems*{7cfac78f-0d55-4fb8-9e7c-e636f6f82d34}*SharedItemsImports = 4
 		EasyRunShared\EasyRunShared.projitems*{b3155dbe-c026-4d0c-8a3e-5363848cf0c5}*SharedItemsImports = 13
 	EndGlobalSection
@@ -26,6 +29,10 @@ Global
 		{7CFAC78F-0D55-4FB8-9E7C-E636F6F82D34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CFAC78F-0D55-4FB8-9E7C-E636F6F82D34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CFAC78F-0D55-4FB8-9E7C-E636F6F82D34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40AAF642-C45B-4243-8F3B-125DA3DE7E3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40AAF642-C45B-4243-8F3B-125DA3DE7E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40AAF642-C45B-4243-8F3B-125DA3DE7E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40AAF642-C45B-4243-8F3B-125DA3DE7E3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
