@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>b3155dbe-c026-4d0c-8a3e-5363848cf0c5</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>EasyRunShared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AttachProperties\DebuggerAttachedProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Binding\BindableBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Binding\RelayCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\MonikersConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\TextConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\VisibilityConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomAttributes\JsonTargetAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomAttributes\JsonTargetType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomMonikers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Dialog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogHost.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogProfileParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogTextParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogWarningOkParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\DialogWarningYesNoParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\Interfaces\IDialogParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dialogs\UITools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRunPackage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRunToolWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRunToolWindowCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\TyeManifestException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Guids.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\EasyRunModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\LoggingTargetModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\LoggingTargetType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ProfileModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ServiceModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\ServiceType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\StateModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PubSubEvents\PubSubEventTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PubSubEvents\PubSubFileMonitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PubSubEvents\PubSubOptionChange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PubSubEvents\PubSubSolution.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\DialogPageProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\FileMonitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\GeneralOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\PathUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\SettingsManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings\TargetPropertiesResolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Studio\VSProjects.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\DTOS\TyeDescriptionDTO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\DTOS\TyeReplicaState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\DTOS\TyeReplicaStatusDTO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\DTOS\TyeServiceDTO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\DTOS\TyeServiceType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\ReplicaItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\TyeHostApi.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tye\TyeManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\EasyRunToolWindowView.xaml.cs">
+      <DependentUpon>EasyRunToolWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Views\EditProfileView.xaml.cs">
+      <DependentUpon>EditProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Views\EditView.xaml.cs">
+      <DependentUpon>EditView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Views\WarningOkView.xaml.cs">
+      <DependentUpon>WarningOkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Views\WarningYesNoView.xaml.cs">
+      <DependentUpon>WarningYesNoView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Styles\EasyRunStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\EasyRunToolWindowView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\EditProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\EditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\WarningOkView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\WarningYesNoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

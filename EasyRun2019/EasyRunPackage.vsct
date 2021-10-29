@@ -48,7 +48,7 @@
           If you do not want an image next to your command, remove the Icon node /> -->
       <Button guid="guidEasyRunPackageCmdSet" id="EasyRunToolWindowCommandId" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="CustomImages" id="EasyRun" />
+        <Icon guid="CustomImages" id="Icon16x16" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>EasyRun</ButtonText>
