@@ -20,6 +20,7 @@ namespace EasyRun
     /// </summary>
     internal sealed partial class PackageIds
     {
-        public const int EasyRun = 0x0001;
+        public const int Icon16x16 = 0x0001;
+        public const int Icon = 0x0002;
     }
 }

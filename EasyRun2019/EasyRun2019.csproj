@@ -67,16 +67,14 @@
       <Generator>VsctGenerator</Generator>
       <LastGenOutput>CustomImages.cs</LastGenOutput>
     </VSCTCompile>
-    <Content Include="..\EasyRunSharedResources\Icon.16x16.png">
+    <Resource Include="..\EasyRunSharedResources\Icon.16x16.png">
       <Link>Resources\Icon.16x16.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\EasyRunSharedResources\Icon.png">
+    </Resource>
+    <Resource Include="..\EasyRunSharedResources\Icon.png">
       <Link>Resources\Icon.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
+    </Resource>
     <Content Include="..\LICENSE">
       <Link>Resources\LICENSE</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -120,13 +118,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\EasyRunSharedResources\Icon.xaml">
+    <Resource Include="..\EasyRunSharedResources\Icon.xaml">
       <Link>Resources\Icon.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
+    </Resource>
   </ItemGroup>
   <Import Project="..\EasyRunShared\EasyRunShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
