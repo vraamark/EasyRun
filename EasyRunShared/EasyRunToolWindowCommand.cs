@@ -82,7 +82,7 @@ namespace EasyRun
         /// <param name="e">The event args.</param>
         private void Execute(object sender, EventArgs e)
         {
-            this.package.JoinableTaskFactory.RunAsync(async delegate
+            this.package.JoinableTaskFactory.Run(async delegate
             {
                 ToolWindowPane window = await this.package.ShowToolWindowAsync(typeof(EasyRunToolWindow), 0, true, this.package.DisposalToken);
                 if ((null == window) || (null == window.Frame))
