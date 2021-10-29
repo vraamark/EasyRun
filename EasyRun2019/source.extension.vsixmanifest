@@ -5,8 +5,8 @@
         <DisplayName>EasyRun</DisplayName>
         <Description xml:space="preserve">EasyRun lets you startup multiple project at the same time using Tye or VS.</Description>
         <License>Resources\LICENSE</License>
-        <Icon>Resources\Icon.png</Icon>
-        <PreviewImage>Resources\Icon.png</PreviewImage>
+        <Icon>Resources\ExtIcon.png</Icon>
+        <PreviewImage>Resources\ExtIconPreview.png</PreviewImage>
         <Tags>debugger, startup, startup project, startup projects, tye, project tye, multiple, microservices</Tags>
         <Preview>true</Preview>
     </Metadata>
