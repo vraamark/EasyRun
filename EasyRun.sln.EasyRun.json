@@ -1,0 +1,15 @@
+{
+  "Profiles": [
+    {
+      "Name": "Default",
+      "Filter": "",
+      "UseTye": false,
+      "TyePort": 8000,
+      "LoggingTargetType": 0,
+      "LoggingPath": "./.logs",
+      "LoggerUrl": null,
+      "Services": []
+    }
+  ],
+  "SettingsId": "6e197ac6-e7bb-4aa2-804a-9011378b40a7"
+}
