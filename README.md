@@ -4,7 +4,9 @@
 This extension makes it easy to run and debug microservices using Tye or
 multiple startup projects in Visual Studio.
 
-Download this extension from the [VS Gallery](https://marketplace.visualstudio.com/items?itemName=BrianVraamark.EasyRun)
+Download this extension from the VS Gallery:
+- [Visual Studio 2019 version](https://marketplace.visualstudio.com/items?itemName=BrianVraamark.EasyRun)
+- [Visual Studio 2022 version](https://marketplace.visualstudio.com/items?itemName=BrianVraamark.EasyRun64Bit)
 
 # Prerequisites
 
