@@ -1,3 +1,7 @@
+# The end of the Tye Experiment (and EasyRun)
+
+As can be seen in [issue 1622](https://github.com/dotnet/tye/issues/1622) in the Tye Project, it is largely replaced by [.NET Aspire](https://github.com/dotnet/aspire). For that reason, EasyRun has been archived.
+
 # EasyRun
 
 
@@ -109,7 +113,7 @@ you have Visual Studio opened more the once.
 
 #### Logging
 
-When selecting logging, you can choose between two types – with or without URL.
+When selecting logging, you can choose between two types â€“ with or without URL.
 - When selecting a type **with URL**, you have to specify an URL to an existing
 running logger (remote or local).
 
@@ -143,7 +147,7 @@ Here you can define command-line arguments to the service.
 
 Here you can define environment variables for the service. You define each
 variable as a key/value pair on a separate line. The key and the value has to be
-separated på an equal sign.
+separated pÃ¥ an equal sign.
 
 #### Secret Variables
 
